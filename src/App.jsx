@@ -38,7 +38,7 @@ function App() {
             {!isAuthenticated && <Route path="/login" element={<Login />} />}
             {!isAuthenticated && <Route path='/register' element={<Register/>} />}
             {isAuthenticated && <Route path='/logout' element={<Logout/>} />}
-            {isAuthenticated && <Route path='/profile' element={<Profile/>} />}
+            {isAuthenticated && <Route path="/profile/:id" element={<Profile />} />}
           </Routes>
         </Router>
       </ThemeProvider>

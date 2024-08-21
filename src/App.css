@@ -185,3 +185,23 @@ body {
   background-color: var(--sidebar-hover-bg);
   color: var(--text-color);
 }
+
+/*profile*/
+
+.card-profile {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.profile-column {
+  border-right: 1px solid #ddd;
+  padding-right: 20px;
+}
+
+.profile-column:last-child {
+  border-right: none; 
+}
+

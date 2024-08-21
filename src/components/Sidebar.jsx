@@ -3,8 +3,10 @@ import { Offcanvas, Button, Nav } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Logout from './Logout';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 function Sidebar({ isAuthenticated }) {
+  const { userId, login } = useAuth(); // Get userId and login from AuthContext
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState('');
 
@@ -17,14 +19,16 @@ function Sidebar({ isAuthenticated }) {
         const response = await axios.get('http://localhost:8000/misc/current_user/', {
           withCredentials: true,
         });
-        if (response.status === 200) {
-          setUsername(response.data.username);
+        if (response.status === 200 && response.data.id) {
+          const { id, username } = response.data;
+          setUsername(username);
+          login(id); // Set the userId in AuthContext
         } else {
           setUsername('Guest');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        setUsername('Guest'); 
+        setUsername('Guest');
       }
     };
 
@@ -33,7 +37,7 @@ function Sidebar({ isAuthenticated }) {
     } else {
       setUsername('Guest');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, login]);
 
   return (
     <>
@@ -44,10 +48,10 @@ function Sidebar({ isAuthenticated }) {
         <Nav className="flex-column">
           {isAuthenticated ? (
             <>
-              <Nav.Link href='/profile' className="p-2">
+              <Nav.Link href={`/profile/${userId || ''}`} className="p-2">
                 <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
-              <Nav.Link href='/reading_list' className="p-2">
+              <Nav.Link href="/reading_list" className="p-2">
                 <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
               <Nav.Link className="p-2">
@@ -59,10 +63,10 @@ function Sidebar({ isAuthenticated }) {
             </>
           ) : (
             <>
-              <Nav.Link href="/login"className="p-2">
+              <Nav.Link href="/login" className="p-2">
                 <i className="bi bi-box-arrow-in-right" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
-              <Nav.Link href='/register' className="p-2">
+              <Nav.Link href="/register" className="p-2">
                 <i className="bi bi-person-plus" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
             </>
@@ -76,11 +80,11 @@ function Sidebar({ isAuthenticated }) {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column">
-            {isAuthenticated ? (
-              <>
-                <Nav.Link href="/profile" className='mb-1' onClick={handleClose}>
-                  <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
-                </Nav.Link>
+          {isAuthenticated && userId ? (
+            <>
+              <Nav.Link href={`/profile/${userId}`} className="mb-1">
+                <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
+              </Nav.Link>
                 <Nav.Link href="/reading-list" className='mb-1' onClick={handleClose}>
                   <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i> Reading List
                 </Nav.Link>
