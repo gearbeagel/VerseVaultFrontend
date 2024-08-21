@@ -6,9 +6,10 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 function Sidebar({ isAuthenticated }) {
-  const { userId, login } = useAuth(); // Get userId and login from AuthContext
+  const { userId, login } = useAuth();
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState('');
+  const [userType, setUserType] = useState(''); // Updated to match the state variable
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -20,8 +21,9 @@ function Sidebar({ isAuthenticated }) {
           withCredentials: true,
         });
         if (response.status === 200 && response.data.id) {
-          const { id, username } = response.data;
+          const { id, username, user_type } = response.data;
           setUsername(username);
+          setUserType(user_type); // Correctly set userType
           login(id); // Set the userId in AuthContext
         } else {
           setUsername('Guest');
@@ -54,12 +56,16 @@ function Sidebar({ isAuthenticated }) {
               <Nav.Link href="/reading_list" className="p-2">
                 <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
-              <Nav.Link className="p-2">
-                <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i>
-              </Nav.Link>
-              <Nav.Link className="p-2">
-                <i className="bi bi-pencil" style={{ fontSize: '1.5rem' }}></i>
-              </Nav.Link>
+              {userType === 'WRITER' && (
+                <>
+                  <Nav.Link className="p-2" href="/your-stories">
+                    <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i>
+                  </Nav.Link>
+                  <Nav.Link className="p-2" href="/create-story">
+                    <i className="bi bi-pencil" style={{ fontSize: '1.5rem' }}></i>
+                  </Nav.Link>
+                </>
+              )}
             </>
           ) : (
             <>
@@ -74,26 +80,30 @@ function Sidebar({ isAuthenticated }) {
         </Nav>
       </div>
 
-      <Offcanvas show={show} onHide={handleClose} placement="start" className="custom-sidebar w-25">
+      <Offcanvas show={show} onHide={handleClose} placement="start" className="custom-sidebar">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Welcome, {username || 'Guest'}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column">
-          {isAuthenticated && userId ? (
-            <>
-              <Nav.Link href={`/profile/${userId}`} className="mb-1">
-                <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
-              </Nav.Link>
+            {isAuthenticated && userId ? (
+              <>
+                <Nav.Link href={`/profile/${userId}`} className="mb-1">
+                  <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
+                </Nav.Link>
                 <Nav.Link href="/reading-list" className='mb-1' onClick={handleClose}>
                   <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i> Reading List
                 </Nav.Link>
-                <Nav.Link href="/your-stories" className='mb-1' onClick={handleClose}>
-                  <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i> Your Stories
-                </Nav.Link>
-                <Nav.Link href="/create-story" className='mb-1' onClick={handleClose}>
-                  <i className="bi bi-pencil" style={{ fontSize: '1.5rem' }}></i> Create Story
-                </Nav.Link>
+                {userType === 'WRITER' && (
+                  <>
+                    <Nav.Link href="/your-stories" className='mb-1' onClick={handleClose}>
+                      <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i> Your Stories
+                    </Nav.Link>
+                    <Nav.Link href="/create-story" className='mb-1' onClick={handleClose}>
+                      <i className="bi bi-pencil" style={{ fontSize: '1.5rem' }}></i> Create Story
+                    </Nav.Link>
+                  </>
+                )}
                 <Nav.Item>
                   <hr className="divider" />
                 </Nav.Item>

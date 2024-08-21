@@ -107,9 +107,9 @@ body {
 
 /*sidebar*/
 
-.offcanvas {
-  width: min-content; 
-  max-width: fit-content;
+.offcanvas .custom-sidebar {
+  width: 100px; 
+  max-width: 100px
 }
 
 

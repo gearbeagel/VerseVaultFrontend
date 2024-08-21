@@ -1,18 +1,19 @@
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import Login from './components/Login';
 import Logout from './components/Logout';
 import Homepage from './components/Homepage';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import Register from './components/Register';
+import Profile from './components/Profile';
+import Settings from './components/Settings';
 import Sidebar from './components/Sidebar';
 import AppNavbar from './components/Navbar';
 import ThemeProvider from './context/ThemeContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { checkUserAuth } from './misc/Api'; 
+import { checkUserAuth } from './misc/Api';
 import { AuthProvider } from './context/AuthContext';
-import Register from './components/Register';
-import Profile from "./components/Profile";
+import "./App.css"
+import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,19 +30,20 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
-      <ThemeProvider>
-        <Router>
-          <AppNavbar />
-          <Sidebar isAuthenticated={isAuthenticated} />
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            {!isAuthenticated && <Route path="/login" element={<Login />} />}
-            {!isAuthenticated && <Route path='/register' element={<Register/>} />}
-            {isAuthenticated && <Route path='/logout' element={<Logout/>} />}
-            {isAuthenticated && <Route path="/profile/:id" element={<Profile />} />}
-          </Routes>
-        </Router>
-      </ThemeProvider>
+        <ThemeProvider>
+          <Router>
+            <AppNavbar />
+            <Sidebar isAuthenticated={isAuthenticated} />
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              {!isAuthenticated && <Route path="/login" element={<Login />} />}
+              {!isAuthenticated && <Route path='/register' element={<Register />} />}
+              {isAuthenticated && <Route path='/logout' element={<Logout />} />}
+              {isAuthenticated && <Route path="/profile/:id" element={<Profile />} />}
+              {isAuthenticated && <Route path="settings" element={<Settings />} />}
+            </Routes>
+          </Router>
+        </ThemeProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

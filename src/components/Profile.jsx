@@ -56,22 +56,26 @@ function Profile() {
       <div className="row justify-content-center">
         {/* Profile Card */}
         <div className="col-lg-6 col-md-8 mb-4">
-        <div className="card profile-card column shadow-lg rounded p-4">
+          <div className="card profile-card shadow-lg rounded p-4">
             <div className="card-body">
-                <div className="text-center me-4">
-                    <FontAwesomeIcon icon={icon} size="4x" />
-                    <h3 className="mt-3">{profile.username}</h3>
-                <div>
+              <div className="text-center">
+                <FontAwesomeIcon icon={icon} size="5x" />
+                <div className="d-flex align-items-center justify-content-center mt-3">
+                  <h3 className="mb-0 me-2">{profile.username}</h3>
+                  {profile.user_type === 'WRITER' ? (
+                    <i className="bi bi-pencil" style={{ fontSize: '1rem' }}></i> // Pen icon
+                  ) : (
+                    <i className="bi bi-book" style={{ fontSize: '1rem' }}></i> // Book icon
+                  )}
+                </div>
                 <hr />
-                    <div className='text-start'>
-                    <small className="d-block mb-2">{profile.user_type}</small>
-                    <p><strong>Bio:</strong> {profile.bio}</p>
-                    <p><strong>Location:</strong> {profile.location}</p>
-                    </div>
+                <div className='text-start'>
+                  <p><strong><i className="bi bi-file-text"></i></strong> {profile.bio}</p>
+                  <p><strong><i className="bi bi-geo-alt-fill"></i></strong> {profile.location}</p>
                 </div>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -85,7 +89,7 @@ function Profile() {
             </div>
           )}
 
-          <div className={`card stats-card shadow-lg rounded p-4 ${profile.user_type === 'writer' ? '' : 'mb-4'}`}>
+          <div className={`card stats-card shadow-lg rounded p-4 ${profile.user_type === 'WRITER' ? '' : 'mb-4'}`}>
             <div className="card-body">
               <h5>Reader Stats</h5>
               <hr />
