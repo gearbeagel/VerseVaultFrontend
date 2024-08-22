@@ -30,6 +30,9 @@ function Profile() {
 
         setProfile({
           username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
           bio: bio || '',
           location: location || '',
           icon_name: icon_name || 'fa-user',
@@ -56,19 +59,20 @@ function Profile() {
     <div className="container mt-5">
       <div className="row justify-content-center">
         {/* Profile Card */}
-        <div className="col-lg-6 col-md-8 mb-4">
+        <div className="col-4 mb-4">
           <div className="card profile-card shadow-lg rounded p-4">
             <div className="card-body">
               <div className="text-center">
                 <FontAwesomeIcon icon={icon} size="5x" />
                 <div className="d-flex align-items-center justify-content-center mt-3">
-                  <h3 className="mb-0 me-2">{profile.username}</h3>
+                  <h2 className="mb-0 me-2">{profile.username}</h2>
                   {profile.user_type === 'WRITER' ? (
-                    <i className="bi bi-pencil" style={{ fontSize: '1rem' }}></i> // Pen icon
+                    <i className="bi bi-pencil" style={{ fontSize: '1rem' }}></i> 
                   ) : (
-                    <i className="bi bi-book" style={{ fontSize: '1rem' }}></i> // Book icon
+                    <i className="bi bi-book" style={{ fontSize: '1rem' }}></i>
                   )}
                 </div>
+                <h6 className='mt-1'>{profile.first_name} {profile.last_name}</h6>
                 <hr />
                 <div className='text-start'>
                   {profile.bio && (
@@ -77,6 +81,12 @@ function Profile() {
                   {profile.location && (
                     <p><strong><i className="bi bi-geo-alt-fill"></i></strong> {profile.location}</p>
                   )}
+                 <p>
+                  <strong><i className="bi bi-envelope"></i></strong>{" "}
+                  <span>
+                    <a style={{color: "var(--text-color)"}} href={`mailto:${profile.email}`}>{profile.email}</a>
+                  </span>
+                </p>
                 </div>
               </div>
             </div>
@@ -84,7 +94,7 @@ function Profile() {
         </div>
 
         {/* Stats Cards */}
-        <div className="col-lg-6 col-md-8">
+        <div className="col-6">
           {profile.user_type === 'WRITER' && (
             <div className="card stats-card shadow-lg rounded p-4 mb-4">
               <div className="card-body">
