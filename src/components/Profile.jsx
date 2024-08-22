@@ -4,14 +4,15 @@ import { useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCat, faDog, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faCat, faDog, faFrog, faCrow, faUser } from '@fortawesome/free-solid-svg-icons';
 
 function Profile() {
   const iconMap = {
     'fa-cat': faCat,
     'fa-dog': faDog,
+    'fa-frog': faFrog,
+    'fa-crow': faCrow,
     'fa-user': faUser,
-    // Add more mappings as needed
   };
 
   const { id } = useParams(); // Get the user ID from the URL
@@ -29,8 +30,8 @@ function Profile() {
 
         setProfile({
           username: user.username,
-          bio: bio || 'No bio available',
-          location: location || 'No location available',
+          bio: bio || '',
+          location: location || '',
           icon_name: icon_name || 'fa-user',
           user_type: user_type || 'Unknown',
         });
@@ -70,8 +71,12 @@ function Profile() {
                 </div>
                 <hr />
                 <div className='text-start'>
-                  <p><strong><i className="bi bi-file-text"></i></strong> {profile.bio}</p>
-                  <p><strong><i className="bi bi-geo-alt-fill"></i></strong> {profile.location}</p>
+                  {profile.bio && (
+                    <p><strong><i className="bi bi-file-text"></i></strong> {profile.bio}</p>
+                  )}
+                  {profile.location && (
+                    <p><strong><i className="bi bi-geo-alt-fill"></i></strong> {profile.location}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -85,6 +90,7 @@ function Profile() {
               <div className="card-body">
                 <h5>Writer Stats</h5>
                 <hr />
+                {/* Add writer-specific stats here */}
               </div>
             </div>
           )}
@@ -93,6 +99,7 @@ function Profile() {
             <div className="card-body">
               <h5>Reader Stats</h5>
               <hr />
+              {/* Add reader-specific stats here */}
             </div>
           </div>
         </div>
