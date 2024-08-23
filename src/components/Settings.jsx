@@ -206,6 +206,12 @@ function Settings() {
                     </div>
                     <div className="form-group mt-3 mb-3">
                       <label htmlFor="email">Email:</label>
+                      <i
+                      className="bi bi-question-circle ms-2"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="bottom"
+                      title="You can't change your email."
+                    ></i>
                       <input
                         type="email"
                         id="email"

@@ -179,6 +179,20 @@ body {
   cursor: pointer;
 }
 
+/*home*/
+.my-masonry-grid {
+  display: flex;
+  margin-left: 100px;
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 30px; 
+  background-clip: padding-box;
+}
+
 /*login*/
 
 .login-container {
