@@ -14,6 +14,7 @@ import { checkUserAuth } from './misc/Api';
 import { AuthProvider } from './context/AuthContext';
 import "./App.css"
 import 'bootstrap/dist/css/bootstrap.css';
+import WorkCreate from './components/WorkCreate';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,7 +41,8 @@ function App() {
               {!isAuthenticated && <Route path='/register' element={<Register />} />}
               {isAuthenticated && <Route path='/logout' element={<Logout />} />}
               {isAuthenticated && <Route path="/profile/:id" element={<Profile />} />}
-              {isAuthenticated && <Route path="settings" element={<Settings />} />}
+              {isAuthenticated && <Route path="/settings" element={<Settings />} />}
+              {isAuthenticated && <Route path="/create-story" element={<WorkCreate />}/>}
             </Routes>
           </Router>
         </ThemeProvider>
