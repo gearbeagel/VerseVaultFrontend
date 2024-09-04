@@ -8,6 +8,7 @@
   --button-bg: #252525;
   --button-text: #ffffff;
   --text-hover-bg: #cacaca;
+  --text-m: #464d53;
 }
 
 .dark {
@@ -19,6 +20,7 @@
   --button-bg: #ffffff;
   --button-text: #343a40;
   --text-hover-bg: #3f454b;
+  --text-m: #acacac;
 }
 
 .dim {
@@ -30,6 +32,7 @@
   --button-bg: #ccdadd;
   --button-text: #2c3e50; 
   --text-hover-bg: #415d79;
+  --text-m: #b3cce7;
 }
 
 /*body*/
@@ -59,6 +62,10 @@ body {
   text-align: center;
 }
 
+.text-m {
+  color: var(--text-m) !important;
+}
+
 .btn-sw {
   background-color: var(--button-bg) !important;
   color: var(--button-text) !important;
@@ -71,6 +78,11 @@ body {
 
 .btn-sw:hover {
   background-color: darken(var(--sidebar-hover-bg), 10%);
+}
+
+.bg-sw {
+  background-color: var(--button-bg) !important;
+  color: var(--button-text) !important;
 }
 
 /*sidebar-hidden*/
@@ -209,5 +221,9 @@ body {
   color: (--text-color);
   text-decoration: none;
 
+}
+
+.btn-close {
+  z-index: 0;
 }
 
