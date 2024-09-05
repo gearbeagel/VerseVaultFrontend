@@ -41,7 +41,8 @@ function Settings() {
               withCredentials: true,
             }
           );
-          const { username, first_name, last_name, email, user_type } = response.data;
+          const { username, first_name, last_name, email, user_type } =
+            response.data;
           setFormData({ username, first_name, last_name, email, user_type });
           setDisableWriterFeatures(user_type !== "WRITER");
         } else if (activeForm === "profile") {
@@ -204,24 +205,6 @@ function Settings() {
                         className="form-control"
                       />
                     </div>
-                    <div className="form-group mt-3 mb-3">
-                      <label htmlFor="email">Email:</label>
-                      <i
-                      className="bi bi-question-circle ms-2"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="bottom"
-                      title="You can't change your email."
-                    ></i>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                      />
-                    </div>
                   </>
                 )}
 
@@ -322,30 +305,35 @@ function Settings() {
                         </div>
                       </div>
                       <div className="form-group mt-3 mb-3">
-                      <label htmlFor="user_type">Disable writing features:</label>
-                      <div className="form-check form-switch">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          id="flexSwitchCheckDefault"
-                          checked={formData.user_type === "READER"}
-                          onChange={handleToggleChange}
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="flexSwitchCheckDefault"
-                        >
-                          {formData.user_type === "READER" ? "Yes" : "No"}
+                        <label htmlFor="user_type">
+                          Disable writing features:
                         </label>
+                        <div className="form-check form-switch">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id="flexSwitchCheckDefault"
+                            checked={formData.user_type === "READER"}
+                            onChange={handleToggleChange}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="flexSwitchCheckDefault"
+                          >
+                            {formData.user_type === "READER" ? "Yes" : "No"}
+                          </label>
+                        </div>
                       </div>
-                    </div>
                     </div>
                   </>
                 )}
               </div>
               <div className="card-footer text-center">
-                <button type="submit" className="btn btn-sw text-center w-75 mt-3">
+                <button
+                  type="submit"
+                  className="btn btn-sw text-center w-75 mt-3"
+                >
                   Save
                 </button>
               </div>

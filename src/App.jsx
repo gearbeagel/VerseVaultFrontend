@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './components/Login';
-import Logout from './components/Logout';
-import Homepage from './components/Homepage';
-import Register from './components/Register';
-import Profile from './components/Profile';
-import Settings from './components/Settings';
-import Sidebar from './components/Sidebar';
-import AppNavbar from './components/Navbar';
-import ThemeProvider from './context/ThemeContext';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { checkUserAuth } from './misc/Api';
-import { AuthProvider } from './context/AuthContext';
-import "./App.css"
-import 'bootstrap/dist/css/bootstrap.css';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./components/Login";
+import Logout from "./components/Logout";
+import Homepage from "./components/Homepage";
+import Register from "./components/Register";
+import Profile from "./components/Profile";
+import Settings from "./components/Settings";
+import Sidebar from "./components/Sidebar";
+import AppNavbar from "./components/Navbar";
+import ThemeProvider from "./context/ThemeContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { checkUserAuth } from "./misc/Api";
+import { AuthProvider } from "./context/AuthContext";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.css";
+import WorkCreate from "./components/WorkCreate";
+import YourWorks from "./components/WorkListWriters";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,10 +39,22 @@ function App() {
             <Routes>
               <Route path="/" element={<Homepage />} />
               {!isAuthenticated && <Route path="/login" element={<Login />} />}
-              {!isAuthenticated && <Route path='/register' element={<Register />} />}
-              {isAuthenticated && <Route path='/logout' element={<Logout />} />}
-              {isAuthenticated && <Route path="/profile/:id" element={<Profile />} />}
-              {isAuthenticated && <Route path="settings" element={<Settings />} />}
+              {!isAuthenticated && (
+                <Route path="/register" element={<Register />} />
+              )}
+              {isAuthenticated && <Route path="/logout" element={<Logout />} />}
+              {isAuthenticated && (
+                <Route path="/profile/:id" element={<Profile />} />
+              )}
+              {isAuthenticated && (
+                <Route path="/settings" element={<Settings />} />
+              )}
+              {isAuthenticated && (
+                <Route path="/create-story" element={<WorkCreate />} />
+              )}
+              {isAuthenticated && (
+                <Route path="/your-stories" element={<YourWorks />} />
+              )}
             </Routes>
           </Router>
         </ThemeProvider>
