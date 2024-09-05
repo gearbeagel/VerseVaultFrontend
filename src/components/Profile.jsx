@@ -61,9 +61,6 @@ function Profile() {
 
   const icon = profile ? iconMap[profile.icon_name] || faUser : faUser;
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
