@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { getCsrfTokenFromCookie } from "../misc/Api"; // Ensure this function is correctly implemented
+import { getCsrfTokenFromCookie } from "../misc/Api"; 
 
 function WorkCreate() {
   const [title, setTitle] = useState("");
@@ -16,6 +17,7 @@ function WorkCreate() {
   const [activeTagIndex, setActiveTagIndex] = useState(-1);
   const searchInputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -113,7 +115,7 @@ function WorkCreate() {
     const csrfToken = getCsrfTokenFromCookie("csrftoken");
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:8000/works/works/",
         workData,
         {
@@ -128,6 +130,11 @@ function WorkCreate() {
         ? "Work published successfully!"
         : "Work saved as draft successfully!";
       toast.success(message);
+
+      const chapterId = response.data.chapter_edit_url.split('/').filter(Boolean).pop();
+      console.log(chapterId); 
+      setTimeout(() => navigate(`/chapter-detail/${chapterId}`), 4000);
+
       setTitle("");
       setLanguage("en");
       setSummary("");

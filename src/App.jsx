@@ -16,6 +16,7 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.css";
 import WorkCreate from "./components/WorkCreate";
 import YourWorks from "./components/WorkListWriters";
+import EditChapter from "./components/EditChapter";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,6 +52,9 @@ function App() {
               )}
               {isAuthenticated && (
                 <Route path="/create-story" element={<WorkCreate />} />
+              )}
+              {isAuthenticated && (
+                <Route path="/chapter-detail/:id" element={<EditChapter/>}/>
               )}
               {isAuthenticated && (
                 <Route path="/your-stories" element={<YourWorks />} />

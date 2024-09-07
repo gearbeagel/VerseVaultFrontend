@@ -59,6 +59,14 @@ function Profile() {
     fetchProfile();
   }, [id]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   const icon = profile ? iconMap[profile.icon_name] || faUser : faUser;
 
   return (
@@ -152,3 +160,4 @@ function Profile() {
 }
 
 export default Profile;
+
