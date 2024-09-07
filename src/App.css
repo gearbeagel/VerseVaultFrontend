@@ -199,8 +199,6 @@ body {
 }
 
 .my-masonry-grid_column {
-  margin-left: -20px;
-  margin-right: -20px;
   padding-left: 30px; 
   background-clip: padding-box;
 }
@@ -241,3 +239,34 @@ body {
   z-index: 0;
 }
 
+/*loading*/
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1); /* Light grey border */
+  border-left: 4px solid var(--text-color); /* Blue border */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+  display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/*editor*/
+.editor-toolbar {
+  margin-bottom: 1rem;
+}
+
+.editor-container .tiptap, .ProseMirror {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  background-color: #ffffff;
+  color: black;
+  min-height: 300px; 
+  overflow-y: auto; /* Add scroll if content overflows */
+}

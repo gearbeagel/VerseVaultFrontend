@@ -15,6 +15,7 @@ function WorkCreate() {
   const [filteredTags, setFilteredTags] = useState([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [activeTagIndex, setActiveTagIndex] = useState(-1);
+  const [loading, setLoading] = useState(false); // Loading state
   const searchInputRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -103,6 +104,7 @@ function WorkCreate() {
 
   const handleSubmit = async (e, posted) => {
     e.preventDefault();
+    setLoading(true); // Start loading
 
     const workData = {
       title,
@@ -132,7 +134,6 @@ function WorkCreate() {
       toast.success(message);
 
       const chapterId = response.data.chapter_edit_url.split('/').filter(Boolean).pop();
-      console.log(chapterId); 
       setTimeout(() => navigate(`/chapter-detail/${chapterId}`), 4000);
 
       setTitle("");
@@ -145,6 +146,8 @@ function WorkCreate() {
       } else {
         toast.error("An unexpected error occurred.");
       }
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -239,20 +242,22 @@ function WorkCreate() {
                   </div>
                 </div>
               </div>
-              <div className="card-footer">
+              <div className="card-footer text-center">
                 <button
                   type="button"
-                  className="btn btn-sw me-2 mt-3"
+                  className="btn btn-sw me-2 mt-3 w-75"
                   onClick={(e) => handleSubmit(e, false)}
+                  disabled={loading} // Disable button while loading
                 >
-                  Save as Draft
+                  {loading ? "Saving..." : "Save as Draft"}
                 </button>
                 <button
                   type="button"
-                  className="btn btn-sw mt-3"
+                  className="btn btn-sw mt-3 w-75"
                   onClick={(e) => handleSubmit(e, true)}
+                  disabled={loading} // Disable button while loading
                 >
-                  Publish
+                  {loading ? "Publishing..." : "Publish"}
                 </button>
               </div>
             </form>

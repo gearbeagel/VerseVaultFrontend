@@ -10,11 +10,14 @@ import { useAuth } from "../context/AuthContext";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
+
     try {
       const csrfToken = getCsrfTokenFromCookie("csrftoken");
 
@@ -40,6 +43,8 @@ function Login() {
       } else {
         toast.error("An unexpected error occurred.");
       }
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -60,6 +65,7 @@ function Login() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
+                    disabled={loading} // Disable input while loading
                   />
                 </div>
                 <div className="form-group mb-3">
@@ -71,6 +77,7 @@ function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading} // Disable input while loading
                   />
                 </div>
                 <div className="text-center mt-3">
@@ -78,8 +85,12 @@ function Login() {
                 </div>
               </div>
               <div className="mt-3 card-footer text-center">
-                <button type="submit" className="btn btn-sw text-center mt-3 w-75">
-                  Login
+                <button
+                  type="submit"
+                  className="btn btn-sw text-center mt-3 w-75"
+                  disabled={loading} // Disable button while loading
+                >
+                  {loading ? "Logging In..." : "Login"} {/* Change button text while loading */}
                 </button>
               </div>
             </form>

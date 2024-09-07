@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const Homepage = () => {
   const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(true); // Loading state
   const isAuthenticated = true; // Replace with actual authentication check
 
   const breakpointColumnsObj = {
@@ -27,6 +28,8 @@ const Homepage = () => {
       } catch (error) {
         console.error('Error fetching user data:', error);
         setUsername('Guest');
+      } finally {
+        setLoading(false); // End loading
       }
     };
 
@@ -34,30 +37,39 @@ const Homepage = () => {
       fetchUser();
     } else {
       setUsername('Guest');
+      setLoading(false); // End loading
     }
   }, [isAuthenticated]);
 
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner"></div> {/* Display spinner */}
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-5">
+    <div className="container mt-5" style={{maxWidth: "1600px", margin: "auto auto"}}>
       <Masonry
         breakpointCols={breakpointColumnsObj}
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        <div className="card p-5 mb-2 h-auto greeting-card">
-          <h1>Hello, {username}.</h1>
+        <div className="card p-5 mb-2 mx-3 h-auto w-100 greeting-card">
+          <h2>Hello, {username}.</h2>
           <h6>Welcome!</h6>
         </div>
-        <div className="card mb-2 p-5">
+        <div className="card mb-2 mx-3 w-100 p-5">
           <p>Card 2</p>
         </div>
-        <div className="card mb-2 p-5">
+        <div className="card mb-2 mx-3 w-100 p-5">
           <p>Card 3</p>
         </div>
-        <div className="card mb-2 p-5">
+        <div className="card mb-2 mx-3 w-100 p-5">
           <p>Card 4</p>
         </div>
-        <div className="card mb-2 p-5 ">
+        <div className="card mb-2 mx-3 w-100 p-5 ">
           <p>Card 5</p>
         </div>
       </Masonry>

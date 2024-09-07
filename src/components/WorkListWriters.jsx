@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from 'react-router-dom'; 
 
 function YourWorks() {
   const [works, setWorks] = useState([]);
@@ -35,9 +36,17 @@ function YourWorks() {
     fetchWorks();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner"></div> {/* Display spinner */}
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4" style={{ color: 'var(--text-color)' }}>Your Works</h2>
+      <h2 className="text-center mb-5" style={{ color: 'var(--text-color)' }}>Your Works</h2>
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : error ? (
@@ -45,10 +54,10 @@ function YourWorks() {
       ) : (
         <div className="row justify-content-center">
           {works.map((work) => (
-            <div key={work.id} className="col-md-8 col-lg-6 mb-4">
-              <div className="card shadow-sm border-0">
+            <div key={work.id} className="col-12 mb-4">
+              <div className="card shadow-lg border-0"  style={{maxWidth: '1500px', margin: 'auto 0'}}>
                 <div className="card-body">
-                  <h5 className="card-title">{work.title}</h5>
+                  <Link to={`/story/${work.id}`} style={{ textDecoration: 'none', color: 'inherit' }}><h5 className="card-title">{work.title} <small className="text-m">{work.posted ? '' : '(Draft)'}</small></h5></Link>
                   <p className="card-text">
                     {work.tags.length > 0 && (
                       <div>
@@ -61,7 +70,7 @@ function YourWorks() {
                     )}
                   </p>
                   <p className="card-text"><small className="text-m">Language: {work.language}</small></p>
-                  <p className="card-text"><small className="text-m">{work.posted ? '' : 'Draft'}</small></p>
+                  <p className="card-text"><small className="text-m">Word Count: {work.word_count}</small></p>
                   <hr/>
                   <p className="card-text">{work.summary}</p>
                 </div>

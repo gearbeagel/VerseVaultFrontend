@@ -17,6 +17,20 @@ import "bootstrap/dist/css/bootstrap.css";
 import WorkCreate from "./components/WorkCreate";
 import YourWorks from "./components/WorkListWriters";
 import EditChapter from "./components/EditChapter";
+import WorkDetail from "./components/ViewWork";
+import { LoadingProvider, useLoading } from "./context/LoadingContext";
+
+function GlobalLoadingSpinner() {
+  const { loading } = useLoading();
+
+  if (!loading) return null;
+
+  return (
+    <div className="global-spinner text-center mt-5">
+      <div className="spinner"></div>
+    </div>
+  );
+}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,9 +46,11 @@ function App() {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <LoadingProvider>
       <AuthProvider>
         <ThemeProvider>
           <Router>
+            <GlobalLoadingSpinner/>
             <AppNavbar />
             <Sidebar isAuthenticated={isAuthenticated} />
             <Routes>
@@ -59,10 +75,14 @@ function App() {
               {isAuthenticated && (
                 <Route path="/your-stories" element={<YourWorks />} />
               )}
+              {isAuthenticated && (
+                <Route path="/story/:id" element={<WorkDetail/>}/>
+              )}
             </Routes>
           </Router>
         </ThemeProvider>
       </AuthProvider>
+      </LoadingProvider>
     </GoogleOAuthProvider>
   );
 }

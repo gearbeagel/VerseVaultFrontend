@@ -60,7 +60,11 @@ function Profile() {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner"></div> {/* Display spinner */}
+      </div>
+    );
   }
 
   if (error) {
@@ -160,4 +164,3 @@ function Profile() {
 }
 
 export default Profile;
-
