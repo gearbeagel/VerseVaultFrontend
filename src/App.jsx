@@ -18,6 +18,7 @@ import WorkCreate from "./components/WorkCreate";
 import YourWorks from "./components/WorkListWriters";
 import EditChapter from "./components/EditChapter";
 import WorkDetail from "./components/ViewWork";
+import ViewChapter from "./components/ViewChapter";
 import { LoadingProvider, useLoading } from "./context/LoadingContext";
 
 function GlobalLoadingSpinner() {
@@ -50,9 +51,9 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <Router>
-            <GlobalLoadingSpinner/>
             <AppNavbar />
             <Sidebar isAuthenticated={isAuthenticated} />
+            <GlobalLoadingSpinner/>
             <Routes>
               <Route path="/" element={<Homepage />} />
               {!isAuthenticated && <Route path="/login" element={<Login />} />}
@@ -70,13 +71,19 @@ function App() {
                 <Route path="/create-story" element={<WorkCreate />} />
               )}
               {isAuthenticated && (
-                <Route path="/chapter-detail/:id" element={<EditChapter/>}/>
+                <>
+                  <Route path="/chapter-detail/:id" element={<EditChapter />} />
+                  <Route path="/chapter-detail/new/:workId" element={<EditChapter />} />
+                </>
               )}
               {isAuthenticated && (
                 <Route path="/your-stories" element={<YourWorks />} />
               )}
               {isAuthenticated && (
                 <Route path="/story/:id" element={<WorkDetail/>}/>
+              )}
+              {isAuthenticated && (
+                <Route path="/chapters/:id" element={<ViewChapter/>}/>
               )}
             </Routes>
           </Router>

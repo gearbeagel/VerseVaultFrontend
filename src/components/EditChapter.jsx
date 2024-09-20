@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCsrfTokenFromCookie } from "../misc/Api";
@@ -12,11 +12,13 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
 function EditChapter() {
-  const { id } = useParams(); // Get chapter ID from URL
+  const { id, workId } = useParams(); 
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
-  const { loading, setLoading } = useLoading(); // Access loading state
-  const [wordCount, setWordCount] = useState(0); // State for word count
+  const { loading, setLoading } = useLoading(); 
+  const [wordCount, setWordCount] = useState(0);
+  const navigate = useNavigate();
+  const isEditMode = Boolean(id); 
 
   const editor = useEditor({
     extensions: [
@@ -33,57 +35,65 @@ function EditChapter() {
   });
 
   useEffect(() => {
-    // Fetch the chapter data based on ID
-    const fetchChapter = async () => {
-      setLoading(true); // Set loading to true
-      try {
-        const response = await axios.get(`http://localhost:8000/works/chapters/${id}/`);
-        setTitle(response.data.title);
-        if (editor) {
-          editor.commands.setContent(response.data.content);
+    if (isEditMode) {
+      const fetchChapter = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get(`http://localhost:8000/works/chapters/${id}/`);
+          setTitle(response.data.title);
+          if (editor) {
+            editor.commands.setContent(response.data.content);
+          }
+        } catch (error) {
+          console.error("Error fetching chapter data:", error);
+          toast.error("Failed to fetch chapter. Please try again later.");
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching chapter data:", error);
-        toast.error("Failed to fetch chapter. Please try again later.");
-      } finally {
-        setLoading(false); // Set loading to false
-      }
-    };
+      };
 
-    fetchChapter();
+      fetchChapter();
+    }
 
     return () => {
       if (editor) {
-        editor.destroy(); // Cleanup editor on unmount
+        editor.destroy();
       }
     };
-  }, [id, editor, setLoading]);
+  }, [id, editor, setLoading, isEditMode]);
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const csrfToken = getCsrfTokenFromCookie("csrftoken");
-
-    setLoading(true); // Set loading to true
-
+    setLoading(true);
+    
+    const requestData = { 
+      title, 
+      content: editorContent, 
+      work_id: workId
+    };
+  
     try {
-      await axios.put(
-        `http://localhost:8000/works/chapters/${id}/`,
-        { title, content: editorContent },
-        {
-          headers: {
-            "X-CSRFToken": csrfToken,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // Ensure credentials are sent with the request
-        }
-      );
-      toast.success("Chapter updated successfully!");
+      if (isEditMode) {
+        await axios.put(`http://localhost:8000/works/chapters/${id}/`, requestData, {
+          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+          withCredentials: true,
+        });
+        toast.success("Chapter updated successfully!");
+      } else {
+        await axios.post("http://localhost:8000/works/chapters/", requestData, {
+          headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+          withCredentials: true,
+        });
+        toast.success("Chapter created successfully!");
+        navigate(`/story/${workId}`);
+      }
     } catch (error) {
-      console.error("Error details:", error.response?.data); // Log the error response for details
-      const errorMessage = error.response?.data?.work?.[0] || "Failed to update chapter. Please try again.";
+      console.error("Error details:", error.response?.data);
+      const errorMessage = error.response?.data?.work?.[0] || "Failed to submit chapter. Please try again.";
       toast.error(errorMessage);
     } finally {
-      setLoading(false); // Set loading to false
+      setLoading(false);
     }
   };
 
@@ -96,8 +106,10 @@ function EditChapter() {
       <div className="row justify-content-center mx-auto">
         <div className="col-12">
           <div className="card shadow-lg rounded" style={{ maxWidth: '1500px', margin: 'auto 0' }}>
-            <h2 className="card-title p-3">Edit Chapter</h2>
-            <form onSubmit={handleUpdate}>
+            <h2 className="card-title p-3">
+              {isEditMode ? "Edit Chapter" : "Create Chapter"}
+            </h2>
+            <form onSubmit={handleSubmit}>
               <div className="card-body">
                 <div className="form-group mb-3">
                   <label htmlFor="title">Chapter Title</label>
@@ -159,7 +171,7 @@ function EditChapter() {
               </div>
               <div className="card-footer">
                 <button type="submit" className="btn btn-sw mt-3" disabled={loading}>
-                  {loading ? "Saving..." : "Save Changes"}
+                  {loading ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Save Changes" : "Create Chapter")}
                 </button>
               </div>
             </form>

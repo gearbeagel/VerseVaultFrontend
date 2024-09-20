@@ -104,7 +104,7 @@ function WorkCreate() {
 
   const handleSubmit = async (e, posted) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true); 
 
     const workData = {
       title,
@@ -128,13 +128,9 @@ function WorkCreate() {
           },
         }
       );
-      const message = posted
-        ? "Work published successfully!"
-        : "Work saved as draft successfully!";
-      toast.success(message);
 
       const chapterId = response.data.chapter_edit_url.split('/').filter(Boolean).pop();
-      setTimeout(() => navigate(`/chapter-detail/${chapterId}`), 4000);
+      setTimeout(() => navigate(`/chapter-detail/${chapterId}`), 1000);
 
       setTitle("");
       setLanguage("en");
@@ -247,7 +243,7 @@ function WorkCreate() {
                   type="button"
                   className="btn btn-sw me-2 mt-3 w-75"
                   onClick={(e) => handleSubmit(e, false)}
-                  disabled={loading} // Disable button while loading
+                  disabled={loading}
                 >
                   {loading ? "Saving..." : "Save as Draft"}
                 </button>
@@ -255,7 +251,7 @@ function WorkCreate() {
                   type="button"
                   className="btn btn-sw mt-3 w-75"
                   onClick={(e) => handleSubmit(e, true)}
-                  disabled={loading} // Disable button while loading
+                  disabled={loading}
                 >
                   {loading ? "Publishing..." : "Publish"}
                 </button>

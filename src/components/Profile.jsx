@@ -35,7 +35,15 @@ function Profile() {
             withCredentials: true,
           }
         );
-        const { user, bio, location, icon_name, user_type } = response.data;
+        const {
+          user,
+          bio,
+          location,
+          icon_name,
+          user_type,
+          reader_stats, // Fetch reader stats
+          writer_stats, // Fetch writer stats if needed
+        } = response.data;
 
         setProfile({
           username: user.username,
@@ -46,6 +54,8 @@ function Profile() {
           location: location || "",
           icon_name: icon_name || "fa-user",
           user_type: user_type || "Unknown",
+          reader_stats: reader_stats || null, // Include reader stats
+          writer_stats: writer_stats || null, // Include writer stats
         });
       } catch (err) {
         console.error("Error fetching user profile", err);
@@ -140,7 +150,16 @@ function Profile() {
               <div className="card-body">
                 <h5>Writer Stats</h5>
                 <hr />
-                {/* Add writer-specific stats here */}
+                {profile.writer_stats ? (
+                <div>
+                  <p>
+                    <strong>Works Written: </strong>
+                    {profile.writer_stats.works_written}
+                  </p>
+                </div>
+              ) : (
+                <p>No writer stats available.</p>
+              )}
               </div>
             </div>
           )}
@@ -153,7 +172,20 @@ function Profile() {
             <div className="card-body">
               <h5>Reader Stats</h5>
               <hr />
-              {/* Add reader-specific stats here */}
+              {profile.reader_stats ? (
+                <div>
+                  <p>
+                    <strong>Works Read: </strong>
+                    {profile.reader_stats.works_read}
+                  </p>
+                  <p>
+                    <strong>Work Lists: </strong>
+                    {profile.reader_stats.work_lists}
+                  </p>
+                </div>
+              ) : (
+                <p>No reader stats available.</p>
+              )}
             </div>
           </div>
         </div>

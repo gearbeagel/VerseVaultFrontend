@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Add useNavigate
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
@@ -13,8 +13,9 @@ function WorkDetail() {
     de: "German",
     uk: "Ukrainian",
   };
-  
+
   const { id } = useParams(); // Get Work ID from URL
+  const navigate = useNavigate(); // useNavigate for redirection
   const [work, setWork] = useState(null);
   const [tags, setTags] = useState({});
   const [chapters, setChapters] = useState([]);
@@ -25,15 +26,21 @@ function WorkDetail() {
     const fetchWork = async () => {
       try {
         // Fetch work details
-        const workResponse = await axios.get(`http://localhost:8000/works/works/${id}/`, {
-          withCredentials: true
-        });
+        const workResponse = await axios.get(
+          `http://localhost:8000/works/works/${id}/`,
+          {
+            withCredentials: true,
+          }
+        );
         setWork(workResponse.data);
 
         // Fetch tags
-        const tagResponse = await axios.get("http://localhost:8000/works/tags/", {
-          withCredentials: true
-        });
+        const tagResponse = await axios.get(
+          "http://localhost:8000/works/tags/",
+          {
+            withCredentials: true,
+          }
+        );
         const tagData = tagResponse.data.reduce((acc, tag) => {
           acc[tag.id] = tag.name;
           return acc;
@@ -41,9 +48,12 @@ function WorkDetail() {
         setTags(tagData);
 
         // Fetch chapters
-        const chapterResponse = await axios.get(`http://localhost:8000/works/chapters/?work=${id}`, {
-          withCredentials: true
-        });
+        const chapterResponse = await axios.get(
+          `http://localhost:8000/works/chapters/?work=${id}`,
+          {
+            withCredentials: true,
+          }
+        );
         setChapters(chapterResponse.data);
       } catch (error) {
         setError("Failed to fetch work details.");
@@ -55,6 +65,10 @@ function WorkDetail() {
 
     fetchWork();
   }, [id]);
+
+  const handleAddChapter = () => {
+    navigate(`/chapter-detail/new/${id}`);
+  };
 
   if (loading) {
     return (
@@ -68,7 +82,10 @@ function WorkDetail() {
     <div className="container mt-5">
       <div className="row justify-content-center mx-auto">
         <div className="col-12">
-          <div className="card shadow-lg rounded" style={{ maxWidth: "1000px", margin: "0 auto" }}>
+          <div
+            className="card shadow-lg rounded"
+            style={{ maxWidth: "1000px", margin: "0 auto" }}
+          >
             <h2 className="card-title p-3">
               {work.title}{" "}
               <small className="text-m">{work.posted ? "" : "(Draft)"}</small>
@@ -78,11 +95,14 @@ function WorkDetail() {
                 <p className="text-danger">{error}</p>
               ) : (
                 <>
-                  <div className="card-text">
+                  <div className="card-text mb-3">
                     {work.tags.length > 0 ? (
                       <div>
                         {work.tags.map((tagId) => (
-                          <span key={tagId} className="badge bg-sw badge-tag me-2">
+                          <span
+                            key={tagId}
+                            className="badge bg-sw badge-tag me-2"
+                          >
                             {tags[tagId] || "Unknown"}
                           </span>
                         ))}
@@ -91,9 +111,17 @@ function WorkDetail() {
                       <p>No tags available.</p>
                     )}
                   </div>
-                  <p><strong>Language:</strong> {languageMap[work.language] || "Unknown"}</p>
-                  <p><strong>Word Count:</strong> {work.word_count}</p>
-                  <p><strong>Posted:</strong> {format(new Date(work.created_at), "PPP")}</p>
+                  <p>
+                    <strong>Language:</strong>{" "}
+                    {languageMap[work.language] || "Unknown"}
+                  </p>
+                  <p>
+                    <strong>Word Count:</strong> {work.word_count}
+                  </p>
+                  <p>
+                    <strong>Posted:</strong>{" "}
+                    {format(new Date(work.created_at), "PPP")}
+                  </p>
                   <hr />
                   <p className="card-text">{work.summary}</p>
                 </>
@@ -102,8 +130,16 @@ function WorkDetail() {
           </div>
 
           {/* Chapters Card */}
-          <div className="card shadow-lg rounded mt-4" style={{ maxWidth: "1000px", margin: "20px auto" }}>
-            <h4 className="card-title p-3">Chapters</h4>
+          <div
+            className="card shadow-lg rounded mt-4"
+            style={{ maxWidth: "1000px", margin: "20px auto" }}
+          >
+            <h4 className="card-title p-3 d-flex justify-content-center align-items-center">
+              <span className="me-2">Chapters</span>
+              <button onClick={handleAddChapter} className="btn btn-sw" style={{borderRadius: "50px"}}>
+                <i className="bi bi-plus-circle"></i>
+              </button>
+            </h4>
             <div className="card-body">
               {chapters.length > 0 ? (
                 <div className="d-flex flex-wrap gap-2">
