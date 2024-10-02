@@ -12,13 +12,12 @@ function ViewChapter() {
   const [nextChapter, setNextChapter] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/works/chapters/${id}/`)  // Fetch chapter by ID
+    axios.get(`http://localhost:8000/works/chapters/${id}/`) 
       .then((response) => {
         const currentChapter = response.data;
         setChapter(currentChapter);
         setLoading(false);
 
-        // Fetch chapters in the same work to determine previous and next chapters
         return axios.get(`http://localhost:8000/works/chapters/?work=${currentChapter.work}`);
       })
       .then((response) => {
@@ -57,7 +56,7 @@ function ViewChapter() {
           >
             <button
               className="btn btn-sw position-absolute top-0 start-0 mt-3 ms-3"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/story/${chapter.work}`)}
             >
               Go Back to Work
             </button>
@@ -71,7 +70,7 @@ function ViewChapter() {
               <div>
                 {previousChapter && (
                   <button
-                    className="btn btn-primary me-2"
+                    className="btn btn-sw me-2"
                     onClick={() => navigate(`/chapters/${previousChapter.id}`)}
                   >
                     &laquo; Previous
@@ -79,7 +78,7 @@ function ViewChapter() {
                 )}
                 {nextChapter && (
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-sw"
                     onClick={() => navigate(`/chapters/${nextChapter.id}`)}
                   >
                     Next &raquo;

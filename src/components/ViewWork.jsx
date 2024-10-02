@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom"; // Add useNavigate
+import { useParams, useNavigate } from "react-router-dom"; 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
+import { getCsrfTokenFromCookie } from "../misc/Api"; 
 
 function WorkDetail() {
   const languageMap = {
@@ -20,7 +21,8 @@ function WorkDetail() {
   const [tags, setTags] = useState({});
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(""); // Added for error state
+  const [error, setError] = useState("");
+
 
   useEffect(() => {
     const fetchWork = async () => {
@@ -70,6 +72,51 @@ function WorkDetail() {
     navigate(`/chapter-detail/new/${id}`);
   };
 
+  const handleDelete = () => {
+    const csrfToken = getCsrfTokenFromCookie("csrftoken");
+    const confirmToast = toast(
+      <div>
+        <p>Are you sure you want to delete this work?</p>
+        <div className="d-flex justify-content-center">
+          <button
+            className="btn btn-sw me-2"
+            onClick={async () => {
+              try {
+                await axios.delete(`http://localhost:8000/works/works/${id}/`, {
+                  withCredentials: true,
+                  headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/json",
+                  },
+                });
+                navigate("/your-stories");
+                toast.success("Work deleted successfully");
+              } catch (error) {
+                toast.error("Failed to delete work.");
+              } finally {
+                toast.dismiss(confirmToast); 
+              }
+            }}
+          >
+            Yes, Delete
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => toast.dismiss(confirmToast)} 
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        autoClose: false, 
+        closeOnClick: false,
+        closeButton: false,
+        position: "top-center"
+      }
+    );
+  };
+
   if (loading) {
     return (
       <div className="text-center mt-5">
@@ -86,6 +133,29 @@ function WorkDetail() {
             className="card shadow-lg rounded"
             style={{ maxWidth: "1000px", margin: "0 auto" }}
           >
+            <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
+            <button
+                className="btn btn-sw dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Options
+              </button>
+              <ul className="dropdown-menu dropdown-menu-end bg-sw" aria-labelledby="dropdownMenuButton">
+                <li>
+                  <button className="dropdown-item btn-sw" onClick={handleDelete}>
+                    <i className="bi bi-trash"></i> Delete
+                  </button>
+                </li>
+                <li>
+                  <button className="dropdown-item btn-sw">
+                  <i className="bi bi-pen"></i> Edit
+                  </button>
+                </li>
+              </ul>
+            </div>
             <h2 className="card-title p-3">
               {work.title}{" "}
               <small className="text-m">{work.posted ? "" : "(Draft)"}</small>

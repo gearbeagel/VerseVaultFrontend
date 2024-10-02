@@ -9,10 +9,10 @@ function Sidebar({ isAuthenticated }) {
   const { userId, login } = useAuth();
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState('');
-  const [userType, setUserType] = useState(''); // Updated to match the state variable
+  const [userType, setUserType] = useState('');
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleShow = () => setShow(true); // Always show on click
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,7 +23,7 @@ function Sidebar({ isAuthenticated }) {
         if (response.status === 200 && response.data.id) {
           const { id, username, user_type } = response.data;
           setUsername(username);
-          setUserType(user_type); // Correctly set userType
+          setUserType(user_type);
           login(id); // Set the userId in AuthContext
         } else {
           setUsername('Guest');
@@ -43,10 +43,20 @@ function Sidebar({ isAuthenticated }) {
 
   return (
     <>
-      <div className={`sidebar-icons d-flex flex-column align-items-center ${show ? 'd-none' : 'd-flex'}`}>
-        <Button variant="link" onClick={handleShow} className="p-0 ham-button">
+      {/* Button to open sidebar (only shown on mobile) */}
+      <Button 
+        variant="link" 
+        onClick={handleShow} 
+        className="ham-button d-md-none" // Show button only on screens smaller than md (768px)
+      >
+        <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
+      </Button>
+
+      {/* Sidebar icons (shown on larger screens) */}
+      <div className="d-none d-md-flex flex-column align-items-center sidebar-icons">
+      <Button variant="link" onClick={handleShow} className="p-0 ham-button">
           <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
-        </Button>
+        </Button> {/* Hide on mobile */}
         <Nav className="flex-column">
           {isAuthenticated ? (
             <>
@@ -80,6 +90,7 @@ function Sidebar({ isAuthenticated }) {
         </Nav>
       </div>
 
+      {/* Offcanvas Sidebar */}
       <Offcanvas show={show} onHide={handleClose} placement="start" className="custom-sidebar">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Welcome, {username || 'Guest'}</Offcanvas.Title>
@@ -88,7 +99,7 @@ function Sidebar({ isAuthenticated }) {
           <Nav className="flex-column">
             {isAuthenticated && userId ? (
               <>
-                <Nav.Link href={`/profile/${userId}`} className="mb-1">
+                <Nav.Link href={`/profile/${userId}`} className="mb-1" onClick={handleClose}>
                   <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
                 </Nav.Link>
                 <Nav.Link href="/reading-list" className='mb-1' onClick={handleClose}>
