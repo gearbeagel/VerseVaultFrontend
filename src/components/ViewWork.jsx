@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom"; 
+import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
-import { getCsrfTokenFromCookie } from "../misc/Api"; 
+import { getCsrfTokenFromCookie } from "../misc/Api";
 
 function WorkDetail() {
   const languageMap = {
@@ -15,19 +15,17 @@ function WorkDetail() {
     uk: "Ukrainian",
   };
 
-  const { id } = useParams(); // Get Work ID from URL
-  const navigate = useNavigate(); // useNavigate for redirection
+  const { id } = useParams(); 
+  const navigate = useNavigate();
   const [work, setWork] = useState(null);
   const [tags, setTags] = useState({});
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     const fetchWork = async () => {
       try {
-        // Fetch work details
         const workResponse = await axios.get(
           `http://localhost:8000/works/works/${id}/`,
           {
@@ -36,7 +34,6 @@ function WorkDetail() {
         );
         setWork(workResponse.data);
 
-        // Fetch tags
         const tagResponse = await axios.get(
           "http://localhost:8000/works/tags/",
           {
@@ -49,7 +46,6 @@ function WorkDetail() {
         }, {});
         setTags(tagData);
 
-        // Fetch chapters
         const chapterResponse = await axios.get(
           `http://localhost:8000/works/chapters/?work=${id}`,
           {
@@ -94,7 +90,7 @@ function WorkDetail() {
               } catch (error) {
                 toast.error("Failed to delete work.");
               } finally {
-                toast.dismiss(confirmToast); 
+                toast.dismiss(confirmToast);
               }
             }}
           >
@@ -102,17 +98,17 @@ function WorkDetail() {
           </button>
           <button
             className="btn btn-secondary"
-            onClick={() => toast.dismiss(confirmToast)} 
+            onClick={() => toast.dismiss(confirmToast)}
           >
             Cancel
           </button>
         </div>
       </div>,
       {
-        autoClose: false, 
+        autoClose: false,
         closeOnClick: false,
         closeButton: false,
-        position: "top-center"
+        position: "top-center",
       }
     );
   };
@@ -134,7 +130,7 @@ function WorkDetail() {
             style={{ maxWidth: "1000px", margin: "0 auto" }}
           >
             <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
-            <button
+              <button
                 className="btn btn-sw dropdown-toggle"
                 type="button"
                 id="dropdownMenuButton"
@@ -143,17 +139,26 @@ function WorkDetail() {
               >
                 Options
               </button>
-              <ul className="dropdown-menu dropdown-menu-end bg-sw" aria-labelledby="dropdownMenuButton">
-                <li>
-                  <button className="dropdown-item btn-sw" onClick={handleDelete}>
-                    <i className="bi bi-trash"></i> Delete
-                  </button>
-                </li>
-                <li>
-                  <button className="dropdown-item btn-sw">
-                  <i className="bi bi-pen"></i> Edit
-                  </button>
-                </li>
+              <ul
+                className="dropdown-menu dropdown-menu-end bg-sw"
+                aria-labelledby="dropdownMenuButton"
+              >
+                  <li>
+                    <button
+                      className="dropdown-item btn-sw"
+                      onClick={handleDelete}
+                    >
+                      <i className="bi bi-trash"></i> Delete
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item btn-sw"
+                      onClick={() => navigate(`/edit-story/${id}`)}
+                    >
+                      <i className="bi bi-pen"></i> Edit
+                    </button>
+                  </li>
               </ul>
             </div>
             <h2 className="card-title p-3">
@@ -206,7 +211,11 @@ function WorkDetail() {
           >
             <h4 className="card-title p-3 d-flex justify-content-center align-items-center">
               <span className="me-2">Chapters</span>
-              <button onClick={handleAddChapter} className="btn btn-sw" style={{borderRadius: "50px"}}>
+              <button
+                onClick={handleAddChapter}
+                className="btn btn-sw"
+                style={{ borderRadius: "50px" }}
+              >
                 <i className="bi bi-plus-circle"></i>
               </button>
             </h4>

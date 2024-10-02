@@ -1,84 +1,119 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { getCsrfTokenFromCookie } from "../misc/Api"; 
+import { getCsrfTokenFromCookie } from "../misc/Api";
 
 function WorkCreate() {
-  const [title, setTitle] = useState("");
-  const [language, setLanguage] = useState("en"); // Default to English
-  const [summary, setSummary] = useState("");
-  const [allTags, setAllTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [formData, setFormData] = useState({
+    title: "",
+    language: "en",
+    summary: "",
+  });
+  const { title, language, summary } = formData;
+
+  const [tags, setTags] = useState({ allTags: [], selectedTags: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredTags, setFilteredTags] = useState([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [activeTagIndex, setActiveTagIndex] = useState(-1);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+
   const searchInputRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-
+  const { workId } = useParams();
+  
+  const MAX_TITLE_LENGTH = 100;
+  const MAX_SUMMARY_LENGTH = 500;
+  
   useEffect(() => {
     const fetchTags = async () => {
+      const csrfToken = getCsrfTokenFromCookie("csrftoken");
       try {
-        const response = await axios.get('http://localhost:8000/works/tags/');
-        setAllTags(response.data);
+        const response = await axios.get("http://localhost:8000/works/tags/", {
+          withCredentials: true,
+          headers: {
+            "X-CSRFToken": csrfToken,
+            "Content-Type": "application/json",
+          },
+        });
+        setTags((prev) => ({ ...prev, allTags: response.data }));
         setFilteredTags(response.data);
       } catch (error) {
-        toast.error('Failed to fetch tags.');
+        toast.error("Failed to fetch tags.");
       }
     };
-
     fetchTags();
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && !searchInputRef.current.contains(event.target)) {
-        setShowTagDropdown(false);
-      }
-    };
+    if (workId) {
+      const fetchWorkDetails = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/works/works/${workId}/`,
+            { withCredentials: true }
+          );
+  
+          const { title, language, summary, tags: tagIds } = response.data;
+  
+          const tagResponses = await Promise.all(
+            tagIds.map((tagId) =>
+              axios.get(`http://localhost:8000/works/tags/${tagId}/`, {
+                withCredentials: true,
+              })
+            )
+          );
+  
+          const tags = tagResponses.map((res) => res.data);
+  
+          setFormData({ title, language, summary });
+          setTags((prev) => ({ ...prev, selectedTags: tags }));
+        } catch (error) {
+          toast.error("Failed to fetch work details.");
+          console.error(error);
+        }
+      };
+      fetchWorkDetails();
+    }
+  }, [workId]);
 
-    const handleEscapeKey = (event) => {
-      if (event.key === "Escape") {
-        setShowTagDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, []);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     setFilteredTags(
-      allTags.filter(tag =>
-        tag.name.toLowerCase().includes(query)
-      )
+      tags.allTags.filter((tag) => tag.name.toLowerCase().includes(query))
     );
     setShowTagDropdown(query.length > 0);
     setActiveTagIndex(-1);
   };
 
   const handleAddTag = (tag) => {
-    if (!selectedTags.some(t => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag]);
+    if (!tags.selectedTags.some((t) => t.id === tag.id)) {
+      setTags((prev) => ({
+        ...prev,
+        selectedTags: [...prev.selectedTags, tag],
+      }));
     }
     setSearchQuery("");
-    setFilteredTags(allTags);
+    setFilteredTags(tags.allTags);
     setShowTagDropdown(false);
   };
 
   const handleRemoveTag = (tagId) => {
-    setSelectedTags(selectedTags.filter(tag => tag.id !== tagId));
+    setTags((prev) => ({
+      ...prev,
+      selectedTags: prev.selectedTags.filter((tag) => tag.id !== tagId),
+    }));
   };
 
   const handleKeyDown = (e) => {
@@ -90,9 +125,7 @@ function WorkCreate() {
         );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveTagIndex((prevIndex) =>
-          Math.max(0, prevIndex - 1)
-        );
+        setActiveTagIndex((prevIndex) => Math.max(0, prevIndex - 1));
       } else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         if (activeTagIndex >= 0 && activeTagIndex < filteredTags.length) {
@@ -104,47 +137,63 @@ function WorkCreate() {
 
   const handleSubmit = async (e, posted) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
 
     const workData = {
-      title,
-      language,
-      summary,
+      ...formData,
       posted,
-      tags: selectedTags.map(tag => tag.id),
+      tags: tags.selectedTags.map((tag) => tag.id),
     };
 
     const csrfToken = getCsrfTokenFromCookie("csrftoken");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/works/works/",
-        workData,
-        {
-          withCredentials: true,
-          headers: {
-            "X-CSRFToken": csrfToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const chapterId = response.data.chapter_edit_url.split('/').filter(Boolean).pop();
-      setTimeout(() => navigate(`/chapter-detail/${chapterId}`), 1000);
-
-      setTitle("");
-      setLanguage("en");
-      setSummary("");
-      setSelectedTags([]);
-    } catch (error) {
-      if (error.response && error.response.data) {
-        toast.error(error.response.data.message || "Failed to create work.");
+      if (workId) {
+        await axios.put(
+          `http://localhost:8000/works/works/${workId}/`,
+          workData,
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        toast.success("Work updated successfully!");
+        setTimeout(() => navigate(`/story/${workId}`), 1000);
       } else {
-        toast.error("An unexpected error occurred.");
+        const response = await axios.post(
+          "http://localhost:8000/works/works/",
+          workData,
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+          setTimeout(() => navigate(`/your-stories`), 1000);
       }
+      resetForm();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "An unexpected error occurred."
+      );
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
+  };
+
+  // Reset form fields
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      language: "en",
+      summary: "",
+    });
+    setTags({ allTags: tags.allTags, selectedTags: [] });
   };
 
   return (
@@ -152,8 +201,10 @@ function WorkCreate() {
       <div className="row justify-content-center mx-auto">
         <div className="col-sm-8 col-md-6">
           <div className="card shadow-lg rounded">
-            <h2 className="card-title p-3">Create a Work</h2>
-            <form>
+            <h2 className="card-title p-3">
+              {workId ? "Edit Work" : "Create a Work"}
+            </h2>
+            <form onSubmit={(e) => handleSubmit(e, false)}>
               <div className="card-body">
                 <div className="form-group mb-3">
                   <label htmlFor="title">Title</label>
@@ -162,9 +213,13 @@ function WorkCreate() {
                     className="form-control"
                     id="title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={handleChange}
                     required
+                    maxLength={MAX_TITLE_LENGTH}
                   />
+                  <small className="form-text text-m text-align-end">
+                    {title.length}/{MAX_TITLE_LENGTH} characters
+                  </small>
                 </div>
                 <div className="form-group mb-3">
                   <label htmlFor="language">Language</label>
@@ -172,7 +227,7 @@ function WorkCreate() {
                     className="form-control"
                     id="language"
                     value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
+                    onChange={handleChange}
                     required
                   >
                     <option value="en">English</option>
@@ -188,8 +243,12 @@ function WorkCreate() {
                     className="form-control"
                     id="summary"
                     value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
+                    onChange={handleChange}
+                    maxLength={MAX_SUMMARY_LENGTH}
                   />
+                  <small className="form-text text-m right-0">
+                    {summary.length}/{MAX_SUMMARY_LENGTH} characters
+                  </small>
                 </div>
                 <div className="form-group mb-3">
                   <label htmlFor="tags">Tags</label>
@@ -214,7 +273,9 @@ function WorkCreate() {
                         {filteredTags.map((tag, index) => (
                           <li
                             key={tag.id}
-                            className={`list-group-item list-group-item-action ${index === activeTagIndex ? 'active' : ''}`}
+                            className={`list-group-item list-group-item-action ${
+                              index === activeTagIndex ? "active" : ""
+                            }`}
                             onClick={() => handleAddTag(tag)}
                           >
                             {tag.name}
@@ -224,7 +285,7 @@ function WorkCreate() {
                     )}
                   </div>
                   <div className="mt-2">
-                    {selectedTags.map(tag => (
+                    {tags.selectedTags.map((tag) => (
                       <span key={tag.id} className="badge bg-sw me-2 my-1">
                         {tag.name}
                         <button
@@ -240,9 +301,8 @@ function WorkCreate() {
               </div>
               <div className="card-footer text-center">
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-sw me-2 mt-3 w-75"
-                  onClick={(e) => handleSubmit(e, false)}
                   disabled={loading}
                 >
                   {loading ? "Saving..." : "Save as Draft"}

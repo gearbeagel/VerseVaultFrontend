@@ -4,7 +4,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCsrfTokenFromCookie } from "../misc/Api";
-import { useLoading } from '../context/LoadingContext';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import TextAlign from '@tiptap/extension-text-align';
@@ -15,8 +14,9 @@ function EditChapter() {
   const { id, workId } = useParams(); 
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
-  const { loading, setLoading } = useLoading(); 
   const [wordCount, setWordCount] = useState(0);
+  const [initialTitle, setInitialTitle] = useState("");
+  const [initialContent, setInitialContent] = useState("");
   const navigate = useNavigate();
   const isEditMode = Boolean(id); 
 
@@ -37,18 +37,18 @@ function EditChapter() {
   useEffect(() => {
     if (isEditMode) {
       const fetchChapter = async () => {
-        setLoading(true);
         try {
           const response = await axios.get(`http://localhost:8000/works/chapters/${id}/`);
           setTitle(response.data.title);
+          setInitialTitle(response.data.title); 
+          setEditorContent(response.data.content);
+          setInitialContent(response.data.content); 
           if (editor) {
             editor.commands.setContent(response.data.content);
           }
         } catch (error) {
           console.error("Error fetching chapter data:", error);
           toast.error("Failed to fetch chapter. Please try again later.");
-        } finally {
-          setLoading(false);
         }
       };
 
@@ -60,12 +60,18 @@ function EditChapter() {
         editor.destroy();
       }
     };
-  }, [id, editor, setLoading, isEditMode]);
+  }, [id, editor, isEditMode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const csrfToken = getCsrfTokenFromCookie("csrftoken");
-    setLoading(true);
+  
+    if (wordCount < 10) {
+      toast.error(<div>We know brevity is great, but try writing about <strong>10 words</strong>?</div>, {
+        html: true 
+      });
+      return; 
+    }
     
     const requestData = { 
       title, 
@@ -92,13 +98,15 @@ function EditChapter() {
       console.error("Error details:", error.response?.data);
       const errorMessage = error.response?.data?.work?.[0] || "Failed to submit chapter. Please try again.";
       toast.error(errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 
   const countWords = (text) => {
     return text.trim().split(/\s+/).length;
+  };
+
+  const hasChanges = () => {
+    return title !== initialTitle || editorContent !== initialContent;
   };
 
   return (
@@ -169,9 +177,9 @@ function EditChapter() {
                   </div>
                 </div>
               </div>
-              <div className="card-footer">
-                <button type="submit" className="btn btn-sw mt-3" disabled={loading}>
-                  {loading ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Save Changes" : "Create Chapter")}
+              <div className="card-footer text-center">
+                <button type="submit" className="btn btn-sw mt-3 w-75" disabled={!hasChanges()}>
+                  {(isEditMode ? "Save Changes" : "Create Chapter")}
                 </button>
               </div>
             </form>

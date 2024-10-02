@@ -26,8 +26,17 @@ function Settings() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeForm, setActiveForm] = useState("user"); // 'user' or 'profile'
+  const [activeForm, setActiveForm] = useState("user");
   const [disableWriterFeatures, setDisableWriterFeatures] = useState(false);
+
+  const limits = {
+    username: 20,
+    first_name: 15,
+    last_name: 15,
+    email: 30,
+    bio: 150,
+    location: 30,
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -70,7 +79,10 @@ function Settings() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    if (value.length <= limits[name] || name === "icon_name") {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleToggleChange = (e) => {
@@ -182,6 +194,10 @@ function Settings() {
                         onChange={handleChange}
                         className="form-control"
                       />
+                      <small className="text-m">
+                        {formData.username ? formData.username.length : 0}/
+                        {limits.username} characters
+                      </small>
                     </div>
                     <div className="form-group mt-3">
                       <label htmlFor="first_name">First Name:</label>
@@ -193,6 +209,10 @@ function Settings() {
                         onChange={handleChange}
                         className="form-control"
                       />
+                      <small className="text-m">
+                        {formData.first_name ? formData.first_name.length : 0}/
+                        {limits.first_name} characters
+                      </small>
                     </div>
                     <div className="form-group mt-3">
                       <label htmlFor="last_name">Last Name:</label>
@@ -204,6 +224,10 @@ function Settings() {
                         onChange={handleChange}
                         className="form-control"
                       />
+                      <small className="text-m">
+                        {formData.last_name ? formData.last_name.length : 0}/
+                        {limits.last_name} characters
+                      </small>
                     </div>
                   </>
                 )}
@@ -215,11 +239,15 @@ function Settings() {
                       <textarea
                         id="bio"
                         name="bio"
-                        value={formData.bio}
+                        value={formData.bio || ""} // Default to empty string if undefined
                         onChange={handleChange}
                         className="form-control"
                         rows="3"
                       />
+                      <small className="text-m">
+                        {formData.bio ? formData.bio.length : 0}/{limits.bio}{" "}
+                        characters
+                      </small>
                     </div>
                     <div className="form-group mt-3">
                       <label htmlFor="location">Location:</label>
@@ -227,10 +255,14 @@ function Settings() {
                         type="text"
                         id="location"
                         name="location"
-                        value={formData.location}
+                        value={formData.location || ""} // Default to empty string if undefined
                         onChange={handleChange}
                         className="form-control"
                       />
+                      <small className="text-m">
+                        {formData.location ? formData.location.length : 0}/
+                        {limits.location} characters
+                      </small>
                     </div>
                     <div className="form-group mt-3">
                       <label>Icon:</label>

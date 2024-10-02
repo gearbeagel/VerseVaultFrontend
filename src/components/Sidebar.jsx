@@ -12,7 +12,7 @@ function Sidebar({ isAuthenticated }) {
   const [userType, setUserType] = useState('');
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true); // Always show on click
+  const handleShow = () => setShow(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,7 +24,7 @@ function Sidebar({ isAuthenticated }) {
           const { id, username, user_type } = response.data;
           setUsername(username);
           setUserType(user_type);
-          login(id); // Set the userId in AuthContext
+          login(id); 
         } else {
           setUsername('Guest');
         }
@@ -43,20 +43,18 @@ function Sidebar({ isAuthenticated }) {
 
   return (
     <>
-      {/* Button to open sidebar (only shown on mobile) */}
       <Button 
         variant="link" 
         onClick={handleShow} 
-        className="ham-button d-md-none" // Show button only on screens smaller than md (768px)
+        className="ham-button d-md-none"
       >
         <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
       </Button>
 
-      {/* Sidebar icons (shown on larger screens) */}
       <div className="d-none d-md-flex flex-column align-items-center sidebar-icons">
       <Button variant="link" onClick={handleShow} className="p-0 ham-button">
           <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
-        </Button> {/* Hide on mobile */}
+        </Button> 
         <Nav className="flex-column">
           {isAuthenticated ? (
             <>
@@ -90,7 +88,6 @@ function Sidebar({ isAuthenticated }) {
         </Nav>
       </div>
 
-      {/* Offcanvas Sidebar */}
       <Offcanvas show={show} onHide={handleClose} placement="start" className="custom-sidebar">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Welcome, {username || 'Guest'}</Offcanvas.Title>

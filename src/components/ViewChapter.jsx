@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 
 function ViewChapter() {
-  const { id } = useParams(); // Extract the chapter ID from the URL
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const [chapter, setChapter] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,19 +12,24 @@ function ViewChapter() {
   const [nextChapter, setNextChapter] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/works/chapters/${id}/`) 
+    axios
+      .get(`http://localhost:8000/works/chapters/${id}/`)
       .then((response) => {
         const currentChapter = response.data;
         setChapter(currentChapter);
         setLoading(false);
 
-        return axios.get(`http://localhost:8000/works/chapters/?work=${currentChapter.work}`);
+        return axios.get(
+          `http://localhost:8000/works/chapters/?work=${currentChapter.work}`
+        );
       })
       .then((response) => {
         const chapters = response.data;
         const sortedChapters = chapters.sort((a, b) => a.position - b.position);
-        const currentIndex = sortedChapters.findIndex(ch => ch.id === parseInt(id));
-        
+        const currentIndex = sortedChapters.findIndex(
+          (ch) => ch.id === parseInt(id)
+        );
+
         if (currentIndex > 0) {
           setPreviousChapter(sortedChapters[currentIndex - 1]);
         }
@@ -52,8 +57,41 @@ function ViewChapter() {
         <div className="col-12">
           <div
             className="card shadow-lg rounded"
-            style={{ maxWidth: "2000px", margin: "0 auto", position: 'relative' }}
+            style={{
+              maxWidth: "2000px",
+              margin: "0 auto",
+              position: "relative",
+            }}
           >
+            <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
+              <button
+                className="btn btn-sw dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Options
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-end bg-sw"
+                aria-labelledby="dropdownMenuButton"
+              >
+                <li>
+                  <button className="dropdown-item btn-sw">
+                    <i className="bi bi-trash"></i> Delete
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="dropdown-item btn-sw"
+                    onClick={() => navigate(`/chapter-detail/${id}`)}
+                  >
+                    <i className="bi bi-pen"></i> Edit
+                  </button>
+                </li>
+              </ul>
+            </div>
             <button
               className="btn btn-sw position-absolute top-0 start-0 mt-3 ms-3"
               onClick={() => navigate(`/story/${chapter.work}`)}
@@ -62,12 +100,10 @@ function ViewChapter() {
             </button>
             <h2 className="card-title p-3">{chapter.title}</h2>
             <div className="card-body">
-              <div
-                dangerouslySetInnerHTML={{ __html: chapter.content }}
-              />
+              <div dangerouslySetInnerHTML={{ __html: chapter.content }} />
             </div>
             <div className="card-footer d-flex justify-content-between">
-              <div>
+              <div className="d-flex justify-content-start">
                 {previousChapter && (
                   <button
                     className="btn btn-sw me-2"
@@ -76,6 +112,8 @@ function ViewChapter() {
                     &laquo; Previous
                   </button>
                 )}
+              </div>
+              <div className="d-flex justify-content-end">
                 {nextChapter && (
                   <button
                     className="btn btn-sw"

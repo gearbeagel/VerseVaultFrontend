@@ -48,47 +48,60 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <LoadingProvider>
-      <AuthProvider>
-        <ThemeProvider>
-          <Router>
-            <AppNavbar />
-            <Sidebar isAuthenticated={isAuthenticated} />
-            <GlobalLoadingSpinner/>
-            <Routes>
-              <Route path="/" element={<Homepage />} />
-              {!isAuthenticated && <Route path="/login" element={<Login />} />}
-              {!isAuthenticated && (
-                <Route path="/register" element={<Register />} />
-              )}
-              {isAuthenticated && <Route path="/logout" element={<Logout />} />}
-              {isAuthenticated && (
-                <Route path="/profile/:id" element={<Profile />} />
-              )}
-              {isAuthenticated && (
-                <Route path="/settings" element={<Settings />} />
-              )}
-              {isAuthenticated && (
-                <Route path="/create-story" element={<WorkCreate />} />
-              )}
-              {isAuthenticated && (
-                <>
-                  <Route path="/chapter-detail/:id" element={<EditChapter />} />
-                  <Route path="/chapter-detail/new/:workId" element={<EditChapter />} />
-                </>
-              )}
-              {isAuthenticated && (
-                <Route path="/your-stories" element={<YourWorks />} />
-              )}
-              {isAuthenticated && (
-                <Route path="/story/:id" element={<WorkDetail/>}/>
-              )}
-              {isAuthenticated && (
-                <Route path="/chapters/:id" element={<ViewChapter/>}/>
-              )}
-            </Routes>
-          </Router>
-        </ThemeProvider>
-      </AuthProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <Router>
+              <AppNavbar />
+              <Sidebar isAuthenticated={isAuthenticated} />
+              <GlobalLoadingSpinner />
+              <Routes>
+                <Route path="/" element={<Homepage />} />
+                {!isAuthenticated && (
+                  <Route path="/login" element={<Login />} />
+                )}
+                {!isAuthenticated && (
+                  <Route path="/register" element={<Register />} />
+                )}
+                {isAuthenticated && (
+                  <Route path="/logout" element={<Logout />} />
+                )}
+                {isAuthenticated && (
+                  <Route path="/profile/:id" element={<Profile />} />
+                )}
+                {isAuthenticated && (
+                  <Route path="/settings" element={<Settings />} />
+                )}
+                {isAuthenticated && (
+                  <>
+                    <Route path="/create-story" element={<WorkCreate />} />
+                    <Route path="/edit-story/:workId" element={<WorkCreate />} />
+                  </>
+                )}
+                {isAuthenticated && (
+                  <>
+                    <Route
+                      path="/chapter-detail/:id"
+                      element={<EditChapter />}
+                    />
+                    <Route
+                      path="/chapter-detail/new/:workId"
+                      element={<EditChapter />}
+                    />
+                  </>
+                )}
+                {isAuthenticated && (
+                  <Route path="/your-stories" element={<YourWorks />} />
+                )}
+                {isAuthenticated && (
+                  <Route path="/story/:id" element={<WorkDetail />} />
+                )}
+                {isAuthenticated && (
+                  <Route path="/chapters/:id" element={<ViewChapter />} />
+                )}
+              </Routes>
+            </Router>
+          </ThemeProvider>
+        </AuthProvider>
       </LoadingProvider>
     </GoogleOAuthProvider>
   );

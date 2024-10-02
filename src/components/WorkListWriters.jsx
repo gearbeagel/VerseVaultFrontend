@@ -18,7 +18,6 @@ function YourWorks() {
         });
         setWorks(workResponse.data);
 
-        // Fetch tags
         const tagResponse = await axios.get('http://localhost:8000/works/tags/');
         const tagData = tagResponse.data.reduce((acc, tag) => {
           acc[tag.id] = tag.name;
@@ -36,14 +35,6 @@ function YourWorks() {
     fetchWorks();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="text-center mt-5">
-        <div className="spinner"></div> {/* Display spinner */}
-      </div>
-    );
-  }
-
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-5" style={{ color: 'var(--text-color)' }}>Your Works</h2>
@@ -56,8 +47,8 @@ function YourWorks() {
           {works.map((work) => (
             <div key={work.id} className="col-12 mb-4">
               <div className="card shadow-lg border-0"  style={{maxWidth: '1500px', margin: 'auto 0'}}>
+              <Link to={`/story/${work.id}`} style={{ textDecoration: 'none', color: 'inherit' }}><h2 className="card-title p-3">{work.title} <small className="text-m">{work.posted ? '' : '(Draft)'}</small></h2></Link>
                 <div className="card-body">
-                  <Link to={`/story/${work.id}`} style={{ textDecoration: 'none', color: 'inherit' }}><h5 className="card-title">{work.title} <small className="text-m">{work.posted ? '' : '(Draft)'}</small></h5></Link>
                   <p className="card-text">
                     {work.tags.length > 0 && (
                       <div>

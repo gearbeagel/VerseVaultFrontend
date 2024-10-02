@@ -4,8 +4,8 @@ import axios from 'axios';
 
 const Homepage = () => {
   const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(true); // Loading state
-  const isAuthenticated = true; // Replace with actual authentication check
+  const [loading, setLoading] = useState(true); 
+  const isAuthenticated = true; 
 
   const breakpointColumnsObj = {
     default: 2,
@@ -29,7 +29,7 @@ const Homepage = () => {
         console.error('Error fetching user data:', error);
         setUsername('Guest');
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
 
@@ -37,17 +37,10 @@ const Homepage = () => {
       fetchUser();
     } else {
       setUsername('Guest');
-      setLoading(false); // End loading
+      setLoading(false);
     }
   }, [isAuthenticated]);
 
-  if (loading) {
-    return (
-      <div className="text-center mt-5">
-        <div className="spinner"></div> {/* Display spinner */}
-      </div>
-    );
-  }
 
   return (
     <div className="container mt-5" style={{maxWidth: "1600px", margin: "auto auto"}}>
