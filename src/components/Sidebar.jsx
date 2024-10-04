@@ -62,11 +62,11 @@ function Sidebar({ isAuthenticated }) {
                 <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
               <Nav.Link href="/reading_list" className="p-2">
-                <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i>
+                <i className="bi bi-bookmark" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
               {userType === 'WRITER' && (
                 <>
-                  <Nav.Link className="p-2" href="/your-stories">
+                  <Nav.Link className="p-2" href="/your-stories?page=your-stories">
                     <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i>
                   </Nav.Link>
                   <Nav.Link className="p-2" href="/create-story">
@@ -100,11 +100,11 @@ function Sidebar({ isAuthenticated }) {
                   <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i> Profile
                 </Nav.Link>
                 <Nav.Link href="/reading-list" className='mb-1' onClick={handleClose}>
-                  <i className="bi bi-book" style={{ fontSize: '1.5rem' }}></i> Reading List
+                  <i className="bi bi-bookmark" style={{ fontSize: '1.5rem' }}></i> Reading List
                 </Nav.Link>
                 {userType === 'WRITER' && (
                   <>
-                    <Nav.Link href="/your-stories" className='mb-1' onClick={handleClose}>
+                    <Nav.Link href="/your-stories?page=your-stories" className='mb-1' onClick={handleClose}>
                       <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem' }}></i> Your Stories
                     </Nav.Link>
                     <Nav.Link href="/create-story" className='mb-1' onClick={handleClose}>
