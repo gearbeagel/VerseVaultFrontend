@@ -263,7 +263,7 @@ function WorkDetail() {
             className="card shadow-lg rounded"
             style={{ maxWidth: "1000px", margin: "0 auto" }}
           >
-            <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
+            <div className="dropdown position-absolute top-0 end-0 my-3 me-3 ">
               <button
                 className="btn btn-sw dropdown-toggle"
                 type="button"
@@ -312,7 +312,7 @@ function WorkDetail() {
                 </li>
               </ul>
             </div>
-            <h2 className="card-title p-3">
+            <h2 className="card-title p-3 mt-3">
               {work.title}{" "}
               <small className="text-m">{work.posted ? "" : "(Draft)"}</small>
             </h2>
@@ -361,7 +361,7 @@ function WorkDetail() {
             style={{ maxWidth: "1000px", margin: "20px auto" }}
           >
             {isAuthor && (
-            <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
+            <div className="dropdown position-absolute top-0 end-0 my-3 me-3 ">
               <button
                 className="btn btn-sw dropdown-toggle"
                 type="button"
@@ -395,7 +395,7 @@ function WorkDetail() {
               </ul>
             </div>
             )}
-            <h4 className="card-title p-3 d-flex justify-content-center align-items-center">
+            <h4 className="card-title p-3 d-flex mt-3 justify-content-center align-items-center">
               <span className="me-2">Chapters</span>
             </h4>
             <div className="card-body text-center">
@@ -424,7 +424,7 @@ function WorkDetail() {
                                 <a
                                   href={`/chapters/${chapter.id}`}
                                   className="btn btn-sw me-2"
-                                  style={{ whiteSpace: "nowrap", width: "650px" }}
+                                  style={{ whiteSpace: "nowrap", width: "300px" }}
                                 >
                                   {chapter.title || "Untitled"}
                                 </a>

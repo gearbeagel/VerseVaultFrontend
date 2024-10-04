@@ -87,7 +87,7 @@ function Profile() {
     <div className="container mt-5">
       <div className="row justify-content-center">
         {/* Profile Card */}
-        <div className="col-4 mb-4">
+        <div className="col-12 col-md-6 mb-4">
           <div className="card profile-card shadow-lg rounded p-4">
             <div className="card-body">
               <div className="text-center">
@@ -95,10 +95,7 @@ function Profile() {
                 <div className="d-flex align-items-center justify-content-center mt-3">
                   <h2 className="mb-0 me-2">{profile.username}</h2>
                   {profile.user_type === "WRITER" ? (
-                    <i
-                      className="bi bi-pencil"
-                      style={{ fontSize: "1rem" }}
-                    ></i>
+                    <i className="bi bi-pencil" style={{ fontSize: "1rem" }}></i>
                   ) : (
                     <i className="bi bi-book" style={{ fontSize: "1rem" }}></i>
                   )}
@@ -112,16 +109,14 @@ function Profile() {
                     <p>
                       <strong>
                         <i className="bi bi-file-text"></i>
-                      </strong>{" "}
-                      {profile.bio}
+                      </strong>{" "}{profile.bio}
                     </p>
                   )}
                   {profile.location && (
                     <p>
                       <strong>
                         <i className="bi bi-geo-alt-fill"></i>
-                      </strong>{" "}
-                      {profile.location}
+                      </strong>{" "}{profile.location}
                     </p>
                   )}
                   <p>
@@ -144,22 +139,22 @@ function Profile() {
         </div>
 
         {/* Stats Cards */}
-        <div className="col-6">
+        <div className="col-12 col-md-6">
           {profile.user_type === "WRITER" && (
             <div className="card stats-card shadow-lg rounded p-4 mb-4">
               <div className="card-body">
                 <h5>Writer Stats</h5>
                 <hr />
                 {profile.writer_stats ? (
-                <div>
-                  <p>
-                    <strong>Works Written: </strong>
-                    {profile.writer_stats.works_written}
-                  </p>
-                </div>
-              ) : (
-                <p>No writer stats available.</p>
-              )}
+                  <div>
+                    <p>
+                      <strong>Works Written: </strong>
+                      {profile.writer_stats.works_written}
+                    </p>
+                  </div>
+                ) : (
+                  <p>No writer stats available.</p>
+                )}
               </div>
             </div>
           )}
