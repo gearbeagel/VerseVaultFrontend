@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { getCsrfTokenFromCookie } from "../misc/Api";
+import { toast, ToastContainer } from "react-toastify";
 
 function ViewChapter() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const navigate = useNavigate();
   const [chapter, setChapter] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +45,55 @@ function ViewChapter() {
       });
   }, [id]);
 
+  const handleDelete = () => {
+    const csrfToken = getCsrfTokenFromCookie("csrftoken");
+    const confirmToast = toast(
+      <>
+        <p>Are you sure you want to delete this chapter?</p>
+        <div className="d-flex justify-content-center">
+          <button
+            className="btn btn-sw me-2"
+            onClick={async () => {
+              try {
+                await axios.delete(
+                  `http://localhost:8000/works/chapters/${id}/`,
+                  {
+                    withCredentials: true,
+                    headers: {
+                      "X-CSRFToken": csrfToken,
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                navigate(`/story/${chapter.work}`);
+                toast.success("Chapter deleted successfully");
+              } catch (error) {
+                toast.error("Failed to delete work.");
+              } finally {
+                toast.dismiss(confirmToast);
+              }
+            }}
+          >
+            Yes, Delete
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => toast.dismiss(confirmToast)}
+          >
+            Cancel
+          </button>
+        </div>
+      </>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        closeButton: false,
+        position: "top-center",
+      }
+    );
+  };
+  
+
   if (loading) {
     return <p>Loading chapter...</p>;
   }
@@ -78,7 +129,10 @@ function ViewChapter() {
                 aria-labelledby="dropdownMenuButton"
               >
                 <li>
-                  <button className="dropdown-item btn-sw">
+                  <button
+                    className="dropdown-item btn-sw"
+                    onClick={handleDelete}
+                  >
                     <i className="bi bi-trash"></i> Delete
                   </button>
                 </li>
@@ -127,6 +181,7 @@ function ViewChapter() {
           </div>
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 }

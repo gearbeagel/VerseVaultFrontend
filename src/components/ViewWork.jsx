@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 import { getCsrfTokenFromCookie } from "../misc/Api";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // Importing required components
 
 function WorkDetail() {
   const languageMap = {
@@ -15,13 +16,40 @@ function WorkDetail() {
     uk: "Ukrainian",
   };
 
-  const { id } = useParams(); 
+  const { id } = useParams();
   const navigate = useNavigate();
   const [work, setWork] = useState(null);
   const [tags, setTags] = useState({});
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [favorite, setFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [editMode, setEditMode] = useState(false); // New edit mode state
+
+  const toggleEditMode = () => {
+    setEditMode((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/misc/current_user/",
+          {
+            withCredentials: true,
+          }
+        );
+        setCurrentUserId(response.data.id);
+        console.log(response.data.id);
+      } catch (error) {
+        toast.error("Failed to fetch current user.");
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const fetchWork = async () => {
@@ -53,6 +81,17 @@ function WorkDetail() {
           }
         );
         setChapters(chapterResponse.data);
+
+        const favoriteResponse = await axios.get(
+          `http://localhost:8000/user-auth/favs/?work=${id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (favoriteResponse.data.length > 0) {
+          setFavorite(true);
+          setFavoriteId(favoriteResponse.data[0].id);
+        }
       } catch (error) {
         setError("Failed to fetch work details.");
         toast.error("Failed to fetch work details.");
@@ -113,6 +152,99 @@ function WorkDetail() {
     );
   };
 
+  const onDragEnd = async (result) => {
+    // Check if the item was dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    // Create a copy of the chapters array
+    const updatedChapters = Array.from(chapters);
+    // Remove the dragged chapter from its original position
+    const [movedChapter] = updatedChapters.splice(result.source.index, 1);
+    // Insert it into the new position
+    updatedChapters.splice(result.destination.index, 0, movedChapter);
+
+    // Update the state with the new chapter order
+    setChapters(updatedChapters);
+
+    // Prepare the data for the API update
+    const updatedChapterData = updatedChapters.map((chapter, index) => ({
+      id: chapter.id,
+      position: index, // Use the new index for the position
+    }));
+
+    try {
+      const csrfToken = getCsrfTokenFromCookie("csrftoken");
+
+      // Send the updates to the server
+      await Promise.all(
+        updatedChapterData.map((chapter) =>
+          axios.put(
+            `http://localhost:8000/works/chapters/${chapter.id}/`,
+            { position: chapter.position },
+            {
+              withCredentials: true,
+              headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        )
+      );
+
+      toast.success("Chapters reordered successfully.");
+    } catch (error) {
+      toast.error("Failed to reorder chapters.");
+      console.error(
+        "Error details:",
+        error.response ? error.response.data : error
+      );
+    }
+  };
+
+  const toggleFavorite = async () => {
+    const csrfToken = getCsrfTokenFromCookie("csrftoken");
+
+    if (favorite) {
+      try {
+        await axios.delete(
+          `http://localhost:8000/user-auth/favs/${favoriteId}/`,
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setFavorite(false);
+        toast.success("Removed from favorites");
+      } catch (error) {
+        toast.error("Failed to remove from favorites.");
+      }
+    } else {
+      try {
+        await axios.post(
+          `http://localhost:8000/user-auth/favs/`,
+          { work: id },
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setFavorite(true);
+        toast.success("Added to favorites");
+      } catch (error) {
+        toast.error("Failed to add to favorites.");
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center mt-5">
@@ -120,6 +252,8 @@ function WorkDetail() {
       </div>
     );
   }
+
+  const isAuthor = work.author === currentUserId; // Check if the current user is the author of the work
 
   return (
     <div className="container mt-5">
@@ -143,22 +277,39 @@ function WorkDetail() {
                 className="dropdown-menu dropdown-menu-end bg-sw"
                 aria-labelledby="dropdownMenuButton"
               >
-                  <li>
-                    <button
-                      className="dropdown-item btn-sw"
-                      onClick={handleDelete}
-                    >
-                      <i className="bi bi-trash"></i> Delete
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item btn-sw"
-                      onClick={() => navigate(`/edit-story/${id}`)}
-                    >
-                      <i className="bi bi-pen"></i> Edit
-                    </button>
-                  </li>
+                {isAuthor && (
+                  <>
+                    <li>
+                      <button
+                        className="dropdown-item btn-sw"
+                        onClick={handleDelete}
+                      >
+                        <i className="bi bi-trash"></i> Delete
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item btn-sw"
+                        onClick={() => navigate(`/edit-story/${id}`)}
+                      >
+                        <i className="bi bi-pen"></i> Edit
+                      </button>
+                    </li>
+                  </>
+                )}
+                <li>
+                  <button
+                    className={`dropdown-item btn-sw`}
+                    onClick={toggleFavorite}
+                  >
+                    <i
+                      className={`bi ${
+                        favorite ? "bi-heart-fill" : "bi-heart"
+                      }`}
+                    ></i>{" "}
+                    {favorite ? "Unfavorite" : "Favorite"}
+                  </button>
+                </li>
               </ul>
             </div>
             <h2 className="card-title p-3">
@@ -209,30 +360,111 @@ function WorkDetail() {
             className="card shadow-lg rounded mt-4"
             style={{ maxWidth: "1000px", margin: "20px auto" }}
           >
+            {isAuthor && (
+            <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
+              <button
+                className="btn btn-sw dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Options
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-end bg-sw"
+                aria-labelledby="dropdownMenuButton"
+              >
+                    <li>
+                      <button
+                        onClick={handleAddChapter}
+                        className="dropdown-item btn-sw"
+                      >
+                        {" "}
+                        <i className="bi bi-plus-circle"></i> Add Chapter
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item btn-sw"
+                        onClick={toggleEditMode}
+                      >
+                        <i className="bi bi-pen"></i> {editMode ? "Done Editing" : "Edit Order"}
+                      </button>
+                    </li>
+              </ul>
+            </div>
+            )}
             <h4 className="card-title p-3 d-flex justify-content-center align-items-center">
               <span className="me-2">Chapters</span>
-              <button
-                onClick={handleAddChapter}
-                className="btn btn-sw"
-                style={{ borderRadius: "50px" }}
-              >
-                <i className="bi bi-plus-circle"></i>
-              </button>
             </h4>
-            <div className="card-body">
+            <div className="card-body text-center">
               {chapters.length > 0 ? (
-                <div className="d-flex flex-wrap gap-2">
-                  {chapters.map((chapter) => (
-                    <a
-                      key={chapter.id}
-                      href={`/chapters/${chapter.id}`}
-                      className="btn btn-sw"
-                      style={{ whiteSpace: "nowrap" }}
-                    >
-                      {chapter.title || "Untitled"}
-                    </a>
-                  ))}
-                </div>
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="droppable-chapters">
+                    {(provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="d-flex flex-column align-items-center gap-2"
+                      >
+                        {chapters.map((chapter, index) => (
+                          <Draggable
+                            key={chapter.id}
+                            draggableId={String(chapter.id)}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="d-flex column"
+                              >
+                                <a
+                                  href={`/chapters/${chapter.id}`}
+                                  className="btn btn-sw me-2"
+                                  style={{ whiteSpace: "nowrap", width: "650px" }}
+                                >
+                                  {chapter.title || "Untitled"}
+                                </a>
+                                {isAuthor && editMode && (
+                                  <div>
+                                    <button
+                                      className="btn btn-sm btn-secondary me-1"
+                                      onClick={() =>
+                                        onDragEnd({
+                                          source: { index },
+                                          destination: { index: index - 1 },
+                                        })
+                                      }
+                                      disabled={index === 0}
+                                    >
+                                      ↑
+                                    </button>
+                                    <button
+                                      className="btn btn-sm btn-secondary"
+                                      onClick={() =>
+                                        onDragEnd({
+                                          source: { index },
+                                          destination: { index: index + 1 },
+                                        })
+                                      }
+                                      disabled={index === chapters.length - 1}
+                                    >
+                                      ↓
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               ) : (
                 <p>No chapters available.</p>
               )}
