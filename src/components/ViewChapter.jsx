@@ -35,7 +35,7 @@ function ViewChapter() {
         if (currentIndex > 0) {
           setPreviousChapter(sortedChapters[currentIndex - 1]);
         }
-        if (currentIndex < sortedChapters.length - 1) {
+        if (currentIndex < sortedChapters.length) {
           setNextChapter(sortedChapters[currentIndex + 1]);
         }
       })
