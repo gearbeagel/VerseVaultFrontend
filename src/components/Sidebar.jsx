@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Offcanvas, Button, Nav } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Offcanvas, Nav, Button } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Logout from './Logout';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
-function Sidebar({ isAuthenticated }) {
+function Sidebar({ isAuthenticated, show, handleClose, handleShow }) {
   const { userId, login } = useAuth();
-  const [show, setShow] = useState(false);
   const [username, setUsername] = useState('');
   const [userType, setUserType] = useState('');
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,7 +20,7 @@ function Sidebar({ isAuthenticated }) {
           const { id, username, user_type } = response.data;
           setUsername(username);
           setUserType(user_type);
-          login(id); 
+          login(id);
         } else {
           setUsername('Guest');
         }
@@ -43,19 +39,13 @@ function Sidebar({ isAuthenticated }) {
 
   return (
     <>
-      <Button 
-        variant="link" 
-        onClick={handleShow} 
-        className="ham-button d-md-none"
-      >
-        <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
-      </Button>
-
+      {/* Icon-only sidebar for larger screens */}
       <div className="d-none d-md-flex flex-column align-items-center sidebar-icons">
-      <Button variant="link" onClick={handleShow} className="p-0 ham-button">
-          <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
-        </Button> 
         <Nav className="flex-column">
+          {/* Use handleShow for desktop icon sidebar */}
+          <Button variant="link" onClick={handleShow} className="p-0 ham-button">
+            <i className="bi bi-list" style={{ fontSize: '2rem' }}></i>
+          </Button>
           {isAuthenticated ? (
             <>
               <Nav.Link href={`/profile/${userId || ''}`} className="p-2">
@@ -88,6 +78,7 @@ function Sidebar({ isAuthenticated }) {
         </Nav>
       </div>
 
+      {/* Offcanvas Sidebar (visible on all screen sizes) */}
       <Offcanvas show={show} onHide={handleClose} placement="start" className="custom-sidebar">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Welcome, {username || 'Guest'}</Offcanvas.Title>

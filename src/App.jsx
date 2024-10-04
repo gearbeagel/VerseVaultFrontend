@@ -6,8 +6,7 @@ import Homepage from "./components/Homepage";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
-import Sidebar from "./components/Sidebar";
-import AppNavbar from "./components/Navbar";
+import HeaderWithSidebar from "./components/MainComponent";
 import ThemeProvider from "./context/ThemeContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { checkUserAuth } from "./misc/Api";
@@ -51,8 +50,7 @@ function App() {
         <AuthProvider>
           <ThemeProvider>
             <Router>
-              <AppNavbar />
-              <Sidebar isAuthenticated={isAuthenticated} />
+              <HeaderWithSidebar isAuthenticated={isAuthenticated} />
               <GlobalLoadingSpinner />
               <Routes>
                 <Route path="/" element={<Homepage />} />
