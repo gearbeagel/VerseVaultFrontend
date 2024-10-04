@@ -2,10 +2,11 @@ import React from 'react';
 import { Navbar, Nav, Form, FormControl, Container, Button } from 'react-bootstrap';
 import ThemeSwitcher from './ThemeSwitcher';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import {toast, ToastContainer} from 'react-toastify';
 
 const AppNavbar = () => {
   const handleSearch = () => {
-    alert('Search triggered!');
+    toast.success('Search triggered!');
   };
 
   return (
@@ -34,6 +35,7 @@ const AppNavbar = () => {
           </Nav>
         </Navbar.Collapse>
       </Container>
+      <ToastContainer/>
     </Navbar>
   );
 };

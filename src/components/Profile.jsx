@@ -21,7 +21,7 @@ function Profile() {
     "fa-user": faUser,
   };
 
-  const { id } = useParams(); // Get the user ID from the URL
+  const { id } = useParams(); 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,8 +41,8 @@ function Profile() {
           location,
           icon_name,
           user_type,
-          reader_stats, // Fetch reader stats
-          writer_stats, // Fetch writer stats if needed
+          reader_stats,
+          writer_stats,
         } = response.data;
 
         setProfile({
@@ -54,8 +54,8 @@ function Profile() {
           location: location || "",
           icon_name: icon_name || "fa-user",
           user_type: user_type || "Unknown",
-          reader_stats: reader_stats || null, // Include reader stats
-          writer_stats: writer_stats || null, // Include writer stats
+          reader_stats: reader_stats || null, 
+          writer_stats: writer_stats || null, 
         });
       } catch (err) {
         console.error("Error fetching user profile", err);
@@ -72,7 +72,7 @@ function Profile() {
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <div className="spinner"></div> {/* Display spinner */}
+        <div className="spinner"></div>
       </div>
     );
   }
