@@ -19,6 +19,7 @@ import EditChapter from "./components/EditChapter";
 import WorkDetail from "./components/ViewWork";
 import ViewChapter from "./components/ViewChapter";
 import { LoadingProvider, useLoading } from "./context/LoadingContext";
+import AllWorks from "./components/WorkListAll";
 
 function GlobalLoadingSpinner() {
   const { loading } = useLoading();
@@ -96,6 +97,9 @@ function App() {
                 {isAuthenticated && (
                   <Route path="/chapters/:id" element={<ViewChapter />} />
                 )}
+                {isAuthenticated && (
+                    <Route path="/all-stories" element={<AllWorks />} />
+                  )}
               </Routes>
             </Router>
           </ThemeProvider>

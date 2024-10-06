@@ -6,9 +6,10 @@
   --sidebar-bg: #f8f9fa;
   --sidebar-hover-bg: #e9ecef; 
   --button-bg: #252525;
-  --button-text: #ffffff;
+  --button-text: #f1efef;
   --text-hover-bg: #cacaca;
   --text-m: #464d53;
+  --navbr-bg: #dee0e2;
 }
 
 .dark {
@@ -21,6 +22,7 @@
   --button-text: #343a40;
   --text-hover-bg: #3f454b;
   --text-m: #acacac;
+  --navbr-bg: #1a1c1f; 
 }
 
 .dim {
@@ -33,6 +35,7 @@
   --button-text: #2c3e50; 
   --text-hover-bg: #415d79;
   --text-m: #b3cce7;
+  --navbr-bg: #2d4255;
 }
 
 /*body*/
@@ -83,6 +86,11 @@ body {
 .bg-sw {
   background-color: var(--button-bg) !important;
   color: var(--button-text) !important;
+}
+
+.bg-sw-2 {
+  background-color: var(--navbr-bg) !important;
+  color: var(--text-color) !important;
 }
 
 /*sidebar-hidden*/

@@ -265,22 +265,26 @@ function WorkCreate() {
                     />
                     {showTagDropdown && filteredTags.length > 0 && (
                       <ul
-                        className="list-group position-absolute w-100 mt-1 dropdown-menu"
-                        ref={dropdownRef}
-                        style={{ zIndex: 1000 }}
-                      >
-                        {filteredTags.map((tag, index) => (
-                          <li
-                            key={tag.id}
-                            className={`list-group-item list-group-item-action ${
-                              index === activeTagIndex ? "active" : ""
-                            }`}
-                            onClick={() => handleAddTag(tag)}
-                          >
-                            {tag.name}
-                          </li>
-                        ))}
-                      </ul>
+                      className="list-group overflow-y-auto position-absolute w-100 mt-1 dropdown-menu"
+                      ref={dropdownRef}
+                      style={{ 
+                        zIndex: 1000,
+                        maxHeight: '200px', // Set the max height you want
+                        overflowY: 'auto', // Enable vertical scrolling
+                      }}
+                    >
+                      {filteredTags.map((tag, index) => (
+                        <li
+                          key={tag.id}
+                          className={`list-group-item list-group-item-action ${
+                            index === activeTagIndex ? "active" : ""
+                          }`}
+                          onClick={() => handleAddTag(tag)}
+                        >
+                          {tag.name}
+                        </li>
+                      ))}
+                    </ul>
                     )}
                   </div>
                   <div className="mt-2">

@@ -75,7 +75,7 @@ function WorkDetail() {
         setTags(tagData);
 
         const chapterResponse = await axios.get(
-          `http://localhost:8000/works/chapters/?work=${id}`,
+          `http://localhost:8000/works_writing/chapters/?work=${id}`,
           {
             withCredentials: true,
           }

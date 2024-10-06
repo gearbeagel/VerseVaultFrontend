@@ -38,7 +38,7 @@ function EditChapter() {
     if (isEditMode) {
       const fetchChapter = async () => {
         try {
-          const response = await axios.get(`http://localhost:8000/works/chapters/${id}/`);
+          const response = await axios.get(`http://localhost:8000/works_writing/chapters/${id}/`);
           setTitle(response.data.title);
           setInitialTitle(response.data.title); 
           setEditorContent(response.data.content);
@@ -81,13 +81,13 @@ function EditChapter() {
   
     try {
       if (isEditMode) {
-        await axios.put(`http://localhost:8000/works/chapters/${id}/`, requestData, {
+        await axios.put(`http://localhost:8000/works_writing/chapters/${id}/`, requestData, {
           headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
           withCredentials: true,
         });
         toast.success("Chapter updated successfully!");
       } else {
-        await axios.post("http://localhost:8000/works/chapters/", requestData, {
+        await axios.post("http://localhost:8000/works_writing/chapters/", requestData, {
           headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
           withCredentials: true,
         });
