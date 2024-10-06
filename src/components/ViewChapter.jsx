@@ -15,14 +15,14 @@ function ViewChapter() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/works/chapters/${id}/`)
+      .get(`http://localhost:8000/works_writing/chapters/${id}/`)
       .then((response) => {
         const currentChapter = response.data;
         setChapter(currentChapter);
         setLoading(false);
 
         return axios.get(
-          `http://localhost:8000/works/chapters/?work=${currentChapter.work}`
+          `http://localhost:8000/works_writing/chapters/?work=${currentChapter.work}`
         );
       })
       .then((response) => {

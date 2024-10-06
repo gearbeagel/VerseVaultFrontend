@@ -21,7 +21,6 @@ const HeaderWithSidebar = ({ isAuthenticated }) => {
     <>
       <Navbar expand="lg" className='sticky-top'>
         <Container>
-          {/* Sidebar toggle button for small screens */}
           <Button variant="link" onClick={handleSidebarShow} className="d-md-none">
             <i className="bi bi-arrow-right-square" style={{ fontSize: '2rem', color: `var(--text-color)` }}></i>
           </Button>

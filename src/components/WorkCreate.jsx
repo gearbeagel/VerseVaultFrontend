@@ -32,7 +32,7 @@ function WorkCreate() {
     const fetchTags = async () => {
       const csrfToken = getCsrfTokenFromCookie("csrftoken");
       try {
-        const response = await axios.get("http://localhost:8000/works/tags/", {
+        const response = await axios.get("http://localhost:8000/works_writing/tags/", {
           withCredentials: true,
           headers: {
             "X-CSRFToken": csrfToken,
@@ -53,7 +53,7 @@ function WorkCreate() {
       const fetchWorkDetails = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/works/works/${workId}/`,
+            `http://localhost:8000/works_writing/works/${workId}/`,
             { withCredentials: true }
           );
   
@@ -61,7 +61,7 @@ function WorkCreate() {
   
           const tagResponses = await Promise.all(
             tagIds.map((tagId) =>
-              axios.get(`http://localhost:8000/works/tags/${tagId}/`, {
+              axios.get(`http://localhost:8000/works_writing/tags/${tagId}/`, {
                 withCredentials: true,
               })
             )
@@ -150,7 +150,7 @@ function WorkCreate() {
     try {
       if (workId) {
         await axios.put(
-          `http://localhost:8000/works/works/${workId}/`,
+          `http://localhost:8000/works_writing/works/${workId}/`,
           workData,
           {
             withCredentials: true,
@@ -164,7 +164,7 @@ function WorkCreate() {
         setTimeout(() => navigate(`/story/${workId}`), 1000);
       } else {
         const response = await axios.post(
-          "http://localhost:8000/works/works/",
+          "http://localhost:8000/works_writing/works/",
           workData,
           {
             withCredentials: true,
@@ -186,7 +186,6 @@ function WorkCreate() {
     }
   };
 
-  // Reset form fields
   const resetForm = () => {
     setFormData({
       title: "",

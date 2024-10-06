@@ -55,7 +55,7 @@ function WorkDetail() {
     const fetchWork = async () => {
       try {
         const workResponse = await axios.get(
-          `http://localhost:8000/works/works/${id}/`,
+          `http://localhost:8000/works_writing/works/${id}/`,
           {
             withCredentials: true,
           }
@@ -63,7 +63,7 @@ function WorkDetail() {
         setWork(workResponse.data);
 
         const tagResponse = await axios.get(
-          "http://localhost:8000/works/tags/",
+          "http://localhost:8000/works_writing/tags/",
           {
             withCredentials: true,
           }
@@ -117,7 +117,7 @@ function WorkDetail() {
             className="btn btn-sw me-2"
             onClick={async () => {
               try {
-                await axios.delete(`http://localhost:8000/works/works/${id}/`, {
+                await axios.delete(`http://localhost:8000/works_writing/works/${id}/`, {
                   withCredentials: true,
                   headers: {
                     "X-CSRFToken": csrfToken,
@@ -153,35 +153,28 @@ function WorkDetail() {
   };
 
   const onDragEnd = async (result) => {
-    // Check if the item was dropped outside the list
     if (!result.destination) {
       return;
     }
 
-    // Create a copy of the chapters array
     const updatedChapters = Array.from(chapters);
-    // Remove the dragged chapter from its original position
     const [movedChapter] = updatedChapters.splice(result.source.index, 1);
-    // Insert it into the new position
     updatedChapters.splice(result.destination.index, 0, movedChapter);
 
-    // Update the state with the new chapter order
     setChapters(updatedChapters);
 
-    // Prepare the data for the API update
     const updatedChapterData = updatedChapters.map((chapter, index) => ({
       id: chapter.id,
-      position: index, // Use the new index for the position
+      position: index, 
     }));
 
     try {
       const csrfToken = getCsrfTokenFromCookie("csrftoken");
 
-      // Send the updates to the server
       await Promise.all(
         updatedChapterData.map((chapter) =>
           axios.put(
-            `http://localhost:8000/works/chapters/${chapter.id}/`,
+            `http://localhost:8000/works_writing/chapters/${chapter.id}/`,
             { position: chapter.position },
             {
               withCredentials: true,
@@ -253,7 +246,7 @@ function WorkDetail() {
     );
   }
 
-  const isAuthor = work.author === currentUserId; // Check if the current user is the author of the work
+  const isAuthor = work.author === currentUserId; 
 
   return (
     <div className="container mt-5">
@@ -355,7 +348,6 @@ function WorkDetail() {
             </div>
           </div>
 
-          {/* Chapters Card */}
           <div
             className="card shadow-lg rounded mt-4"
             style={{ maxWidth: "1000px", margin: "20px auto" }}

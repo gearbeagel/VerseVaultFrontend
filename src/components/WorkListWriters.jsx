@@ -13,12 +13,12 @@ function YourWorks() {
   useEffect(() => {
     const fetchWorks = async () => {
       try {
-        const workResponse = await axios.get('http://localhost:8000/works/works/', {
+        const workResponse = await axios.get('http://localhost:8000/works_writing/works/', {
           withCredentials: true,
         });
         setWorks(workResponse.data);
 
-        const tagResponse = await axios.get('http://localhost:8000/works/tags/');
+        const tagResponse = await axios.get('http://localhost:8000/works_writing/tags/');
         const tagData = tagResponse.data.reduce((acc, tag) => {
           acc[tag.id] = tag.name;
           return acc;
