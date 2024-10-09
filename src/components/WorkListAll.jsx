@@ -10,6 +10,8 @@ function AllWorks() {
   const [error, setError] = useState('');
   const [tags, setTags] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState('');
   const worksPerPage = 10;
 
   useEffect(() => {
@@ -37,11 +39,18 @@ function AllWorks() {
     fetchReadingWorks();
   }, []);
 
+  // Filter works based on search term and selected tag
+  const filteredWorks = readingWorks.filter(work => {
+    const matchesSearchTerm = work.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTag = selectedTag ? work.tags.includes(parseInt(selectedTag)) : true;
+    return matchesSearchTerm && matchesTag;
+  });
+
   const indexOfLastWork = currentPage * worksPerPage;
   const indexOfFirstWork = indexOfLastWork - worksPerPage;
-  const currentWorks = readingWorks.slice(indexOfFirstWork, indexOfLastWork);
-  
-  const totalPages = Math.ceil(readingWorks.length / worksPerPage);
+  const currentWorks = filteredWorks.slice(indexOfFirstWork, indexOfLastWork);
+
+  const totalPages = Math.ceil(filteredWorks.length / worksPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -58,6 +67,28 @@ function AllWorks() {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-5" style={{ color: 'var(--text-color)' }}>Latest Stories</h2>
+
+      {/* Filter section */}
+      <div className="mb-4 d-flex justify-content-center">
+        <input 
+          type="text" 
+          placeholder="Search by title..." 
+          value={searchTerm} 
+          onChange={(e) => setSearchTerm(e.target.value)} 
+          className="form-control w-50 me-3"
+        />
+        <select 
+          className="form-select w-25" 
+          value={selectedTag} 
+          onChange={(e) => setSelectedTag(e.target.value)}
+        >
+          <option value="">All Tags</option>
+          {Object.entries(tags).map(([tagId, tagName]) => (
+            <option key={tagId} value={tagId}>{tagName}</option>
+          ))}
+        </select>
+      </div>
+
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : error ? (

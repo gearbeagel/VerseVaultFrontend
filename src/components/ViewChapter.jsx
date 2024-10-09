@@ -12,6 +12,7 @@ function ViewChapter() {
   const [error, setError] = useState(null);
   const [previousChapter, setPreviousChapter] = useState(null);
   const [nextChapter, setNextChapter] = useState(null);
+  const [fontSize, setFontSize] = useState(16); // Default font size
 
   useEffect(() => {
     axios
@@ -92,7 +93,9 @@ function ViewChapter() {
       }
     );
   };
-  
+
+  const increaseFontSize = () => setFontSize((prevSize) => Math.min(prevSize + 2, 24));
+  const decreaseFontSize = () => setFontSize((prevSize) => Math.max(prevSize - 2, 12));
 
   if (loading) {
     return <p>Loading chapter...</p>;
@@ -152,9 +155,22 @@ function ViewChapter() {
             >
               Go Back to Work
             </button>
-            <h2 className="card-title p-3">{chapter.title}</h2>
+
+            <div className="position-absolute top-6 end-0 me-3 mt-5 d-flex justify-content-end">
+              <button className="btn btn-sw me-2" onClick={decreaseFontSize}>
+                A-
+              </button>
+              <button className="btn btn-sw" onClick={increaseFontSize}>
+                A+
+              </button>
+            </div>
+
+            <h2 className="card-title p-3 mt-3">{chapter.title}</h2>
             <div className="card-body">
-              <div dangerouslySetInnerHTML={{ __html: chapter.content }} />
+              <div
+                style={{ fontSize: `${fontSize}px` }}
+                dangerouslySetInnerHTML={{ __html: chapter.content }}
+              />
             </div>
             <div className="card-footer d-flex justify-content-between">
               <div className="d-flex justify-content-start">
@@ -181,7 +197,7 @@ function ViewChapter() {
           </div>
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 }
