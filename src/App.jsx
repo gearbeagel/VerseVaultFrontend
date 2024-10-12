@@ -20,6 +20,7 @@ import WorkDetail from "./components/ViewWork";
 import ViewChapter from "./components/ViewChapter";
 import { LoadingProvider, useLoading } from "./context/LoadingContext";
 import AllWorks from "./components/WorkListAll";
+import AllBookmarks from "./components/ReadingList";
 
 function GlobalLoadingSpinner() {
   const { loading } = useLoading();
@@ -99,6 +100,9 @@ function App() {
                 )}
                 {isAuthenticated && (
                     <Route path="/all-stories" element={<AllWorks />} />
+                  )}
+                {isAuthenticated && (
+                    <Route path="/reading-list" element={<AllBookmarks />} />
                   )}
               </Routes>
             </Router>

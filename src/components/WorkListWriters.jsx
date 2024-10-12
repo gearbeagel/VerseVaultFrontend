@@ -39,7 +39,9 @@ function YourWorks() {
     <div className="container mt-5">
       <h2 className="text-center mb-5" style={{ color: 'var(--text-color)' }}>Your Works</h2>
       {loading ? (
-        <p className="text-center">Loading...</p>
+            <div className="text-center mt-5">
+              <div className="spinner" role="status"></div>
+            </div>
       ) : error ? (
         <p className="text-center text-danger">{error}</p>
       ) : (

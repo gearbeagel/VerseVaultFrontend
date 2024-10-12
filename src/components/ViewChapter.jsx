@@ -12,38 +12,48 @@ function ViewChapter() {
   const [error, setError] = useState(null);
   const [previousChapter, setPreviousChapter] = useState(null);
   const [nextChapter, setNextChapter] = useState(null);
-  const [fontSize, setFontSize] = useState(16); // Default font size
+  const [fontSize, setFontSize] = useState(16);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8000/works_writing/chapters/${id}/`)
-      .then((response) => {
-        const currentChapter = response.data;
+    const fetchUserAndChapter = async () => {
+      try {
+        // Fetch current user
+        const userResponse = await axios.get(
+          "http://localhost:8000/misc/current_user/",
+          { withCredentials: true }
+        );
+        setUserId(userResponse.data.id);
+        
+        // Fetch chapter
+        const chapterResponse = await axios.get(
+          `http://localhost:8000/works_writing/chapters/${id}/`
+        );
+        const currentChapter = chapterResponse.data;
         setChapter(currentChapter);
-        setLoading(false);
 
-        return axios.get(
+        // Fetch all chapters for navigation
+        const chaptersResponse = await axios.get(
           `http://localhost:8000/works_writing/chapters/?work=${currentChapter.work}`
         );
-      })
-      .then((response) => {
-        const chapters = response.data;
-        const sortedChapters = chapters.sort((a, b) => a.position - b.position);
-        const currentIndex = sortedChapters.findIndex(
-          (ch) => ch.id === parseInt(id)
-        );
+        const sortedChapters = chaptersResponse.data.sort((a, b) => a.position - b.position);
+        const currentIndex = sortedChapters.findIndex(ch => ch.id === parseInt(id));
 
         if (currentIndex > 0) {
           setPreviousChapter(sortedChapters[currentIndex - 1]);
         }
-        if (currentIndex < sortedChapters.length) {
+        if (currentIndex < sortedChapters.length - 1) {
           setNextChapter(sortedChapters[currentIndex + 1]);
         }
-      })
-      .catch((err) => {
-        setError(err.message);
+      } catch (error) {
+        setError("Failed to load data.");
+        console.error(error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchUserAndChapter();
   }, [id]);
 
   const handleDelete = () => {
@@ -69,7 +79,7 @@ function ViewChapter() {
                 navigate(`/story/${chapter.work}`);
                 toast.success("Chapter deleted successfully");
               } catch (error) {
-                toast.error("Failed to delete work.");
+                toast.error("Failed to delete chapter.");
               } finally {
                 toast.dismiss(confirmToast);
               }
@@ -98,12 +108,18 @@ function ViewChapter() {
   const decreaseFontSize = () => setFontSize((prevSize) => Math.max(prevSize - 2, 12));
 
   if (loading) {
-    return <p>Loading chapter...</p>;
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner" role="status"></div>
+      </div>
+    );
   }
 
   if (error) {
     return <p>Error loading chapter: {error}</p>;
   }
+
+  const isAuthor = chapter?.work.id === userId; // Optional chaining for safety
 
   return (
     <div className="container mt-5">
@@ -117,6 +133,7 @@ function ViewChapter() {
               position: "relative",
             }}
           >
+            {isAuthor && (
             <div className="dropdown position-absolute top-0 end-0 mt-3 me-3 ">
               <button
                 className="btn btn-sw dropdown-toggle"
@@ -131,24 +148,25 @@ function ViewChapter() {
                 className="dropdown-menu dropdown-menu-end bg-sw"
                 aria-labelledby="dropdownMenuButton"
               >
-                <li>
-                  <button
-                    className="dropdown-item btn-sw"
-                    onClick={handleDelete}
-                  >
-                    <i className="bi bi-trash"></i> Delete
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item btn-sw"
-                    onClick={() => navigate(`/chapter-detail/${id}`)}
-                  >
-                    <i className="bi bi-pen"></i> Edit
-                  </button>
-                </li>
+                    <li>
+                      <button
+                        className="dropdown-item btn-sw"
+                        onClick={handleDelete}
+                      >
+                        <i className="bi bi-trash"></i> Delete
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item btn-sw"
+                        onClick={() => navigate(`/chapter-detail/${id}`)}
+                      >
+                        <i className="bi bi-pen"></i> Edit
+                      </button>
+                    </li>
               </ul>
             </div>
+            )}
             <button
               className="btn btn-sw position-absolute top-0 start-0 mt-3 ms-3"
               onClick={() => navigate(`/story/${chapter.work}`)}

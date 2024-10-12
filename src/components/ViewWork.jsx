@@ -5,7 +5,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 import { getCsrfTokenFromCookie } from "../misc/Api";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // Importing required components
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import BookmarkModal from "./BookmarkModal";
 
 function WorkDetail() {
   const languageMap = {
@@ -24,9 +25,20 @@ function WorkDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [favorite, setFavorite] = useState(false);
+  const [bookmark, setBookmark] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
+  const [bookmarkId, setBookmarkId] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [editMode, setEditMode] = useState(false); // New edit mode state
+  const [editMode, setEditMode] = useState(false);
+  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+
+  const handleOpenBookmarkModal = () => {
+    setShowBookmarkModal(true);
+  };
+
+  const handleCloseBookmarkModal = () => {
+    setShowBookmarkModal(false);
+  };
 
   const toggleEditMode = () => {
     setEditMode((prev) => !prev);
@@ -92,6 +104,16 @@ function WorkDetail() {
           setFavorite(true);
           setFavoriteId(favoriteResponse.data[0].id);
         }
+        const bookmarkResponse = await axios.get(
+          `http://localhost:8000/works_reading/bookmarks/?work=${id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (bookmarkResponse.data.length > 0) {
+          setBookmark(true);
+          setBookmarkId(bookmarkResponse.data[0].id);
+        }
       } catch (error) {
         setError("Failed to fetch work details.");
         toast.error("Failed to fetch work details.");
@@ -107,6 +129,61 @@ function WorkDetail() {
     navigate(`/chapter-detail/new/${id}`);
   };
 
+  const toggleBookmark = () => {
+    if (bookmark) {
+      const csrfToken = getCsrfTokenFromCookie("csrftoken");
+      const confirmToast = toast(
+        <div>
+          <p>Are you sure you want to remove this work from bookmarks?</p>
+          <div className="d-flex justify-content-center">
+            <button
+              className="btn btn-danger me-2"
+              onClick={async () => {
+                try {
+                  await axios.delete(
+                    `http://localhost:8000/works_reading/bookmarks/${bookmarkId}/`,
+                    {
+                      headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/json",
+                      },
+                      withCredentials: true,
+                    }
+                  );
+                  setBookmark(false);
+                  setBookmarkId(null);
+                  toast.success("Removed from bookmarks");
+                } catch (error) {
+                  toast.error("Failed to remove from bookmarks.");
+                } finally {
+                  toast.dismiss(confirmToast);
+                }
+              }}
+            >
+              Yes, Remove
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => toast.dismiss(confirmToast)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>,
+        {
+          autoClose: false,
+          closeOnClick: false,
+          closeButton: false,
+          position: "top-center",
+        }
+      );
+    } else {
+      handleOpenBookmarkModal();
+    }
+  };
+  
+  
+
   const handleDelete = () => {
     const csrfToken = getCsrfTokenFromCookie("csrftoken");
     const confirmToast = toast(
@@ -117,13 +194,16 @@ function WorkDetail() {
             className="btn btn-sw me-2"
             onClick={async () => {
               try {
-                await axios.delete(`http://localhost:8000/works_writing/works/${id}/`, {
-                  withCredentials: true,
-                  headers: {
-                    "X-CSRFToken": csrfToken,
-                    "Content-Type": "application/json",
-                  },
-                });
+                await axios.delete(
+                  `http://localhost:8000/works_writing/works/${id}/`,
+                  {
+                    withCredentials: true,
+                    headers: {
+                      "X-CSRFToken": csrfToken,
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
                 navigate("/your-stories");
                 toast.success("Work deleted successfully");
               } catch (error) {
@@ -165,7 +245,7 @@ function WorkDetail() {
 
     const updatedChapterData = updatedChapters.map((chapter, index) => ({
       id: chapter.id,
-      position: index, 
+      position: index,
     }));
 
     try {
@@ -231,6 +311,20 @@ function WorkDetail() {
           }
         );
         setFavorite(true);
+        const response = await axios.get(
+          `http://localhost:8000/user-auth/favs/?work=${id}`,
+          {
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        const favorite = response.data[0];
+        const favoriteId = favorite.id;
+        console.log(favoriteId);
+        setFavoriteId(favoriteId);
         toast.success("Added to favorites");
       } catch (error) {
         toast.error("Failed to add to favorites.");
@@ -241,70 +335,88 @@ function WorkDetail() {
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <div className="spinner-border" role="status"></div>
+        <div className="spinner" role="status"></div>
       </div>
     );
   }
 
-  const isAuthor = work.author === currentUserId; 
+  const isAuthor = work.author === currentUserId;
 
   return (
     <div className="container mt-5">
+      <BookmarkModal
+        workId={id}
+        showModal={showBookmarkModal}
+        handleClose={handleCloseBookmarkModal}
+        setFavorite={setFavorite}
+      />
       <div className="row justify-content-center mx-auto">
         <div className="col-12">
           <div
             className="card shadow-lg rounded"
             style={{ maxWidth: "1000px", margin: "0 auto" }}
           >
-            <div className="dropdown position-absolute top-0 end-0 my-3 me-3 ">
-              <button
-                className="btn btn-sw dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Options
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-end bg-sw"
-                aria-labelledby="dropdownMenuButton"
-              >
-                {isAuthor && (
+            <div className="position-absolute top-0 end-0 my-3 me-3">
+              <div className="d-flex justify-content-between align-items-center gap-2">
+                {isAuthor ? (
                   <>
-                    <li>
+                    <div className="dropdown">
                       <button
-                        className="dropdown-item btn-sw"
-                        onClick={handleDelete}
+                        className="btn btn-sw dropdown-toggle"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
                       >
-                        <i className="bi bi-trash"></i> Delete
+                        Options
                       </button>
-                    </li>
-                    <li>
-                      <button
-                        className="dropdown-item btn-sw"
-                        onClick={() => navigate(`/edit-story/${id}`)}
+                      <ul
+                        className="dropdown-menu dropdown-menu-end bg-sw"
+                        aria-labelledby="dropdownMenuButton"
                       >
-                        <i className="bi bi-pen"></i> Edit
-                      </button>
-                    </li>
+                        <li>
+                          <button
+                            className="dropdown-item btn-sw"
+                            onClick={handleDelete}
+                          >
+                            <i className="bi bi-trash"></i> Delete
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="dropdown-item btn-sw"
+                            onClick={() => navigate(`/edit-story/${id}`)}
+                          >
+                            <i className="bi bi-pen"></i> Edit
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
                   </>
+                ) : (
+                  <>
+                  <button className="btn btn-sw" onClick={toggleFavorite}>
+                  <i
+                    className={`bi ${favorite ? "bi-heart-fill" : "bi-heart"}`}
+                  ></i>{" "}
+                  {favorite ? "Unfavorite" : "Favorite"}
+                </button>
+                <button
+                  className="btn btn-sw"
+                  onClick={toggleBookmark}
+                >
+                  <i
+                    className={`bi ${
+                      bookmark ? "bi-bookmark-fill" : "bi-bookmark"
+                    }`}
+                  ></i>{" "}
+                  {bookmark ? "Remove from bookmarks" : "Add bookmark"}
+                </button>
+                </>
                 )}
-                <li>
-                  <button
-                    className={`dropdown-item btn-sw`}
-                    onClick={toggleFavorite}
-                  >
-                    <i
-                      className={`bi ${
-                        favorite ? "bi-heart-fill" : "bi-heart"
-                      }`}
-                    ></i>{" "}
-                    {favorite ? "Unfavorite" : "Favorite"}
-                  </button>
-                </li>
-              </ul>
+              </div>
             </div>
+
             <h2 className="card-title p-3 mt-3">
               {work.title}{" "}
               <small className="text-m">{work.posted ? "" : "(Draft)"}</small>
@@ -331,15 +443,14 @@ function WorkDetail() {
                     )}
                   </div>
                   <p>
-                    <strong>Language:</strong>{" "}
-                    {languageMap[work.language] || "Unknown"}
+                    <i className="bi bi-person"></i> {work.author_username}
                   </p>
                   <p>
-                    <strong>Word Count:</strong> {work.word_count}
+                    <i className="bi bi-globe"></i> {languageMap[work.language]}
                   </p>
                   <p>
-                    <strong>Posted:</strong>{" "}
-                    {format(new Date(work.created_at), "PPP")}
+                    <i className="bi bi-clock"></i>{" "}
+                    {format(new Date(work.created_at), "MMMM d, yyyy")}
                   </p>
                   <hr />
                   <p className="card-text">{work.summary}</p>
@@ -353,39 +464,40 @@ function WorkDetail() {
             style={{ maxWidth: "1000px", margin: "20px auto" }}
           >
             {isAuthor && (
-            <div className="dropdown position-absolute top-0 end-0 my-3 me-3 ">
-              <button
-                className="btn btn-sw dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Options
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-end bg-sw"
-                aria-labelledby="dropdownMenuButton"
-              >
-                    <li>
-                      <button
-                        onClick={handleAddChapter}
-                        className="dropdown-item btn-sw"
-                      >
-                        {" "}
-                        <i className="bi bi-plus-circle"></i> Add Chapter
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="dropdown-item btn-sw"
-                        onClick={toggleEditMode}
-                      >
-                        <i className="bi bi-pen"></i> {editMode ? "Done Editing" : "Edit Order"}
-                      </button>
-                    </li>
-              </ul>
-            </div>
+              <div className="dropdown position-absolute top-0 end-0 my-3 me-3 ">
+                <button
+                  className="btn btn-sw dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Options
+                </button>
+                <ul
+                  className="dropdown-menu dropdown-menu-end bg-sw"
+                  aria-labelledby="dropdownMenuButton"
+                >
+                  <li>
+                    <button
+                      onClick={handleAddChapter}
+                      className="dropdown-item btn-sw"
+                    >
+                      {" "}
+                      <i className="bi bi-plus-circle"></i> Add Chapter
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item btn-sw"
+                      onClick={toggleEditMode}
+                    >
+                      <i className="bi bi-pen"></i>{" "}
+                      {editMode ? "Done Editing" : "Edit Order"}
+                    </button>
+                  </li>
+                </ul>
+              </div>
             )}
             <h4 className="card-title p-3 d-flex mt-3 justify-content-center align-items-center">
               <span className="me-2">Chapters</span>
@@ -416,7 +528,10 @@ function WorkDetail() {
                                 <a
                                   href={`/chapters/${chapter.id}`}
                                   className="btn btn-sw me-2"
-                                  style={{ whiteSpace: "nowrap", width: "300px" }}
+                                  style={{
+                                    whiteSpace: "nowrap",
+                                    width: "300px",
+                                  }}
                                 >
                                   {chapter.title || "Untitled"}
                                 </a>

@@ -39,7 +39,6 @@ function Sidebar({ isAuthenticated, show, handleClose, handleShow }) {
 
   return (
     <>
-      {/* Icon-only sidebar for larger screens */}
       <div className="d-none d-md-flex flex-column align-items-center sidebar-icons">
         <Nav className="flex-column">
           {/* Use handleShow for desktop icon sidebar */}
@@ -51,7 +50,7 @@ function Sidebar({ isAuthenticated, show, handleClose, handleShow }) {
               <Nav.Link href={`/profile/${userId || ''}`} className="p-2">
                 <i className="bi bi-person" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
-              <Nav.Link href="/reading_list" className="p-2">
+              <Nav.Link href="/reading-list" className="p-2">
                 <i className="bi bi-bookmark" style={{ fontSize: '1.5rem' }}></i>
               </Nav.Link>
               {userType === 'WRITER' && (

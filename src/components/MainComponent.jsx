@@ -21,7 +21,7 @@ const HeaderWithSidebar = ({ isAuthenticated }) => {
 
   return (
     <>
-      <Navbar expand="lg" className='sticky-top'>
+      <Navbar expand="lg" className='sticky-top' style={{zIndex: '997'}}>
         <Container>
           <Button variant="link" onClick={handleSidebarShow} className="d-md-none">
             <i className="bi bi-arrow-right-square" style={{ fontSize: '2rem', color: `var(--text-color)` }}></i>
